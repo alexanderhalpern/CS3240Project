@@ -73,11 +73,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
-    'project.middleware.SiteMiddleware',
+    'allauth.account.middleware.AccountMiddleware'
 ]
-DEFAULT_SITE_ID = 1
-SITE_ID = 4
+
+# if env is production then use site_id = 5, else use site_id = 1
+SITE_ID = 5 if os.environ.get('ENV') == 'production' else 4
+
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
