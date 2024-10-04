@@ -1,0 +1,46 @@
+{% load bootstrap5 %}
+{% load static %}
+{% load socialaccount %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ClubHub{% endblock %}</title>
+    
+    {% bootstrap_css %}
+    
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}" />
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-uva-orange">
+        <div class="container">
+            <a class="navbar-brand" href="#">ClubHub</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="signin-container p-5">
+                    <h1 class="text-center mb-4">Welcome to ClubHub</h1>
+                    <p class="text-center mb-5">Centralized CIO Management System</p>
+                    
+                    <div class="text-center mb-4">
+                        <p>Sign in to access your account</p>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center align-items-center w-100">
+                        <a href="{% provider_login_url 'google' %}?next=/" class="google-signin-button">
+                            <img src="{% static 'images/google_signin.svg' %}" alt="Sign in with Google" class="img-fluid" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% bootstrap_javascript %}
+</body>
+</html>

@@ -1,0 +1,38 @@
+:root {
+  --uva-orange: #e57200;
+  --uva-blue: #232d4b;
+}
+.bg-uva-orange {
+  background-color: var(--uva-orange) !important;
+}
+.bg-uva-blue {
+  background-color: var(--uva-blue) !important;
+}
+.btn-uva-orange {
+  background-color: var(--uva-orange) !important;
+  border-color: var(--uva-orange) !important;
+  color: white !important;
+}
+.btn-uva-orange:hover {
+  background-color: #d66a00 !important;
+  border-color: #d66a00 !important;
+}
+.signin-container {
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+.google-signin-button {
+  display: flex;
+  height: 60px;
+  width: 100%;
+  background: none;
+  padding: 0;
+  border: none;
+  justify-content: center;
+  align-items: center;
+}
+.google-signin-button img {
+  height: 100%;
+  width: auto;
+}

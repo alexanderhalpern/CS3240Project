@@ -1,0 +1,61 @@
+{% load allauth i18n %}
+{% load bootstrap5 %}
+{% load static %}
+
+{% block extra_css %}
+    {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-uva-blue text-white">
+                    <h2 class="card-title mb-0">{% trans "Sign Up" %}</h2>
+                </div>
+                <div class="card-body">
+                    <p class="card-text mb-4">
+                        {% url 'account_login' as login_url %}
+                        {% blocktranslate %}Already have an account? Then please <a href="{{ login_url }}" class="text-uva-orange">sign in</a>.{% endblocktranslate %}
+                    </p>
+
+                    {% if not SOCIALACCOUNT_ONLY %}
+                        {% url 'account_signup' as action_url %}
+                        <form method="post" action="{{ action_url }}" class="mb-3">
+                            {% csrf_token %}
+                            {% bootstrap_form form %}
+                            {{ redirect_field }}
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-uva-orange">{% trans "Sign Up" %}</button>
+                            </div>
+                        </form>
+                    {% endif %}
+
+                    {% if PASSKEY_SIGNUP_ENABLED %}
+                        <hr>
+                        <div class="d-grid">
+                            <a href="{{ signup_by_passkey_url }}" class="btn btn-outline-primary">{% trans "Sign up using a passkey" %}</a>
+                        </div>
+                    {% endif %}
+
+                    {% if SOCIALACCOUNT_ENABLED %}
+                        <hr>
+                        {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_body %}
+    {% bootstrap_javascript %}
+{% endblock %}

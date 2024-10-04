@@ -1,0 +1,76 @@
+{% load i18n %}
+{% load allauth account %}
+{% load bootstrap5 %}
+{% load static %}
+
+
+{% block extra_css %}
+    {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-uva-blue text-white">
+                    <h2 class="card-title mb-0">{% trans "Sign In" %}</h2>
+                </div>
+                <div class="card-body">
+                    {% if not SOCIALACCOUNT_ONLY %}
+                        <p class="card-text mb-4">
+                            {% url 'account_signup' as signup_url %}
+                            {% blocktranslate %}If you have not created an account yet, then please <a href="{{ signup_url }}" class="text-uva-orange">sign up</a> first.{% endblocktranslate %}
+                        </p>
+
+                        {% url 'account_login' as login_url %}
+                        <form method="post" action="{{ login_url }}" class="mb-3">
+                            {% csrf_token %}
+                            {% bootstrap_form form %}
+                            {{ redirect_field }}
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-uva-orange">{% trans "Sign In" %}</button>
+                            </div>
+                        </form>
+                    {% endif %}
+
+                    {% if LOGIN_BY_CODE_ENABLED or PASSKEY_LOGIN_ENABLED %}
+                        <hr>
+                        <div class="d-grid gap-2">
+                            {% if PASSKEY_LOGIN_ENABLED %}
+                                <button type="submit" form="mfa_login" id="passkey_login" class="btn btn-outline-primary">
+                                    {% trans "Sign in with a passkey" %}
+                                </button>
+                            {% endif %}
+                            {% if LOGIN_BY_CODE_ENABLED %}
+                                <a href="{{ request_login_code_url }}" class="btn btn-outline-primary">
+                                    {% trans "Mail me a sign-in code" %}
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    {% if SOCIALACCOUNT_ENABLED %}
+                        <hr>
+                        {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_body %}
+    {{ block.super }}
+    {% if PASSKEY_LOGIN_ENABLED %}
+        {% include "mfa/webauthn/snippets/login_script.html" with button_id="passkey_login" %}
+    {% endif %}
+    {% bootstrap_javascript %}
+{% endblock %}
