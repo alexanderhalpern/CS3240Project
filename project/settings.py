@@ -76,8 +76,10 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware'
 ]
 
-# if env is production then use site_id = 5, else use site_id = 1
-SITE_ID = 5 if os.environ.get('ENV') == 'production' else 4
+if os.environ.get('DJANGO_ENV') == 'production':
+    SITE_ID = 2  # Heroku
+else:
+    SITE_ID = 1  # Local development
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
