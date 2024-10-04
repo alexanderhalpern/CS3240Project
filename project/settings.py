@@ -73,9 +73,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware'
+    'allauth.account.middleware.AccountMiddleware',
+    'project.middleware.SiteMiddleware',
 ]
-
+DEFAULT_SITE_ID = 1
 SITE_ID = 4
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
