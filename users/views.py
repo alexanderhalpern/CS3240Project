@@ -1,6 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,  get_object_or_404
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from .models import Profile
 
 
 def home(request):
@@ -11,7 +12,13 @@ def home(request):
 
 @login_required
 def main(request):
-    return render(request, "main.html")
+    profile, created = Profile.objects.get_or_create(user=request.user)
+    if profile.is_pma_admin:
+        return render(request, "main.html", {'user':request.user})
+    else:
+        return render(request, "main.html", {'user': request.user})
+
+    
 
 
 def logout_view(request):
