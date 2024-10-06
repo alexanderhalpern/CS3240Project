@@ -21,11 +21,7 @@
                         <a class="nav-link" href="#" id="toggleView">Toggle View</a>
                     </li>
                     <li class="nav-item">
-                        {% if user.profile.is_pma_admin %}
-                            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#createProjectModal">Create Project</a>
-                        {% else %}
-                            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#createProjectModal">View Projects</a>\
-                        {% endif %}
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#createProjectModal">Create Project</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
@@ -55,7 +51,11 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createProjectModalLabel">Create Project</h5>
+                    {% if user.profile.is_pma_admin %}
+                        <h5 class="modal-title" id="createProjectModalLabel">Create Project</h5>
+                    {% else %}
+                    <h5 class="modal-title" id="createProjectModalLabel">View Projects</h5>
+                    {% endif %}
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -66,3 +66,4 @@
 
 </body>
 </html>
+
