@@ -37,7 +37,7 @@
         <h1 class="text-center mb-4">Welcome, {{ user.first_name }}!</h1>
         <p class="text-center">Account: {{ user.username }}</p>
 
-        {% if user-profile.is_pma_admin %}
+        {% if user.profile.is_pma_admin %}
             <h2>Admin Dashboard</h2>
             <p>You have an admin account! You have been given administrator privileges to manage your club.</p>
         {% else %}
