@@ -13,13 +13,9 @@ def home(request):
 @login_required
 def main(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
-    if profile.is_pma_admin:
-        return render(request, "main.html", {'user':request.user})
-    else:
-        return render(request, "main.html", {'user': request.user})
-
     
-
+    return render(request, "main.html", {'user':request.user, 'profile' : profile})
+   
 
 def logout_view(request):
     logout(request)
