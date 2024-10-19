@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang ='en'>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Profile</title>
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Update Your Profile</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="first_name" class="form-label">First Name</label>
+                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ first_name }}">
+            </div>
+            
+            {% bootstrap_form form %}
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+    {% bootstrap_javascript %}
+</body>
+</html>
