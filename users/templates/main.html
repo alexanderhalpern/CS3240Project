@@ -26,11 +26,13 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#createProjectModal">Create Project</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'calendar' %}">Calendar</a>
+                    </li>                    
                 </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <div class="d-flex justify-content-end align-items-center">
-                            <!-- Profile Picture using Bootstrap classes -->
                             <div class="rounded-circle overflow-hidden" style="width: 40px; height: 40px;">
                                 {% if profile.profile_picture %}
                                     <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="img-fluid">

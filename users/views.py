@@ -3,6 +3,8 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from .models import Profile
 from .forms import ProfileUpdateForm
+import datetime
+from calendar import monthrange
 
 
 def home(request):
@@ -35,6 +37,26 @@ def update_profile(request):
         form = ProfileUpdateForm(instance=profile)  
 
     return render(request, 'update_profile.html', {'form': form, 'first_name': request.user.first_name}) 
+
+
+def calendar_view(request):
+    today = datetime.date.today()
+    month = today.month
+    year = today.year
+    start_day, num_days = monthrange(year, month)
+
+    calendar_data = []
+    for day in range(1, num_days + 1):
+            day_info = {'day': day, 'events': []}
+            calendar_data.append(day_info)
+
+    context = {
+        'today': today,
+        'year': year,
+        'calendar_data': calendar_data,
+    }
+    
+    return render(request, 'calendar.html', context)
 
 def logout_view(request):
     logout(request)
