@@ -1,10 +1,12 @@
-from django.shortcuts import render, redirect,  get_object_or_404
+from django.shortcuts import render, redirect,  get_object_or_404, reverse
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from .models import Profile
-from .forms import ProfileUpdateForm
+from .models import Profile, Project
+from .forms import ProfileUpdateForm, ProjectForm
 import datetime
 from calendar import monthrange
+from django.http import HttpResponse, HttpResponseRedirect
+
 
 
 def home(request):
@@ -16,7 +18,18 @@ def home(request):
 @login_required
 def main(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
-    return render(request, "main.html", {'user':request.user, 'profile' : profile})
+    
+    #input for creating a project
+    form = ProjectForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            newProject = form.save()
+            newProject.save()  
+            return HttpResponseRedirect(reverse("hello:home"))  # Redirect to the list view after saving
+  
+    projects = Project.objects.all()
+
+    return render(request, "main.html", {'user':request.user, 'profile' : profile, 'form': form, 'projects': projects})
 
 @login_required
 def update_profile(request):
