@@ -21,10 +21,14 @@ def main(request):
     # input for creating a project
     form = ProjectForm(request.POST or None)
     if request.method == 'POST':
+        form = ProjectForm(request.POST)
         if form.is_valid():
-            newProject = form.save()
-            newProject.save()
-            return HttpResponseRedirect(reverse("users:main"))
+            project = form.save(commit=False)
+            project.created_by = request.user
+            project.save()
+            return redirect('users:main')
+    else:
+        form = ProjectForm()
 
     projects = Project.objects.all()
     return render(request, "main.html", {'user': request.user, 'profile': profile, 'form': form, 'projects': projects})
