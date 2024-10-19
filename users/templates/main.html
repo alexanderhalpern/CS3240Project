@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +8,10 @@
     {% load bootstrap5 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 </head>
 <body>
+
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">ClubHub</a>
@@ -26,6 +29,18 @@
                 </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item">
+                        <div class="d-flex justify-content-end align-items-center">
+                            <!-- Profile Picture using Bootstrap classes -->
+                            <div class="rounded-circle overflow-hidden" style="width: 40px; height: 40px;">
+                                {% if profile.profile_picture %}
+                                    <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="img-fluid">
+                                {% else %}
+                                    <img src="{% static 'images/default_profile_picture.jpg' %}" alt="Default Profile Picture" class="img-fluid">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'account_logout' %}">Logout</a>
                     </li>
                 </ul>
@@ -34,9 +49,12 @@
     </nav>
 
     <div class="container mt-4">
-        <h1 class="text-center mb-4">Welcome, {{ user.first_name }}!</h1>
+        <h1 class="text-center mb-4">Welcome, {{ user.first_name|default:user.email }}!</h1> 
         <p class="text-center">Account: {{ user.username }}</p>
 
+        <p class="text-center">
+            <a class="btn btn-primary" href="{% url 'update_profile' %}">Update Profile</a> 
+        </p>
         {% if profile.is_pma_admin %}
             <h2>Admin Dashboard</h2>
             <p>You have an admin account! You have been given administrator privileges to manage your club.</p>
