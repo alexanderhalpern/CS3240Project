@@ -25,7 +25,7 @@
                         <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#createProjectModal">Create Project</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'calendar' %}">Calendar</a>
+                        <a class="nav-link" href="{% url 'users:calendar' %}">Calendar</a>
                     </li> 
                 </ul>
                 <ul class="navbar-nav">
@@ -51,7 +51,7 @@
     <div class="container mt-4">
         <h1 class="text-center mb-4">Welcome, {{ user.first_name|default:user.email }}!</h1> 
         <p class="text-center">Account: {{ user.username }}</p>
-        <p class="text-center"> <a class="btn btn-primary" href="{% url 'update_profile' %}">Update Profile</a> </p>
+        <p class="text-center"> <a class="btn btn-primary" href="{% url 'users:update_profile' %}">Update Profile</a> </p>
 
         {% if profile.is_pma_admin %}
             <h2>Admin Dashboard</h2>
