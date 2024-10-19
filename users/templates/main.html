@@ -61,6 +61,21 @@
             <p>You have a general user account!</p>
         {% endif %}
 
+         <!-- show clickable list of projects -->
+        <div class="content">
+            <h1>Projects</h1>
+    
+            {% if projects %}
+                <ul>
+                    {% for p in projects %}
+                        <li><a href="{% url 'users:specific-project' p.id %}">{{ p.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No projects yet.</p>
+            {% endif %}
+        </div>
+
     </div>
 
     <div class="modal fade" id="createProjectModal" tabindex="-1" aria-labelledby="createProjectModalLabel" aria-hidden="true">

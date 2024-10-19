@@ -22,3 +22,11 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
+
+class File(models.Model):
+    project = models.ForeignKey(Project, related_name='files', on_delete=models.CASCADE)
+    file = models.FileField(upload_to='file_storage/')   #will prob need updating
+    upload_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.file.name

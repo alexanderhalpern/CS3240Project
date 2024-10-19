@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect,  get_object_or_404, reverse
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from .models import Profile, Project
-from .forms import ProfileUpdateForm, ProjectForm
+from .forms import ProfileUpdateForm, ProjectForm, FileForm
 import datetime
 from calendar import monthrange
 from django.http import HttpResponse, HttpResponseRedirect
@@ -25,7 +25,7 @@ def main(request):
         if form.is_valid():
             newProject = form.save()
             newProject.save()  
-            return HttpResponseRedirect(reverse("hello:home"))  # Redirect to the list view after saving
+            return HttpResponseRedirect(reverse("users:main"))  
   
     projects = Project.objects.all()
 
@@ -66,6 +66,26 @@ def calendar_view(request):
     }
     
     return render(request, 'calendar.html', context)
+
+def projectView(request, id):
+    project = get_object_or_404(Project, id=id)
+    return render(request, 'project.html', {'description': project.description, 'project': project})
+
+def filesView(request, id):
+    project = get_object_or_404(Project, id=id)
+    form = FileForm(request.POST or None, request.FILES or None)
+    if request.method == 'POST':
+        
+        if form.is_valid():
+            newFile = form.save(commit=False)
+            newFile.project = project
+            newFile.save()  
+            #return HttpResponseRedirect(reverse("users:files"))  --> needs tweaking
+        else:
+            form = FileForm()
+    files = project.files.all() 
+
+    return render(request, 'files.html', {'project': project, 'files': files, 'form': form})
 
 
 
