@@ -14,10 +14,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='File',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('file', models.FileField(upload_to='file_storage/')),
                 ('upload_date', models.DateTimeField(auto_now_add=True)),
-                ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='files', to='users.project')),
+                ('project', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, related_name='files', to='users.project')),
             ],
         ),
     ]
