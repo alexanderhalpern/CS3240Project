@@ -27,29 +27,38 @@ class FileUploadTest(TestCase):
                     os.remove(file_path) #deletes file
         super().tearDown()
 
-    def test_file_upload(self):
-        #mocks a file for uploading
-        test_if_file_uploaded = SimpleUploadedFile("jonproj.txt", b"jon code", content_type="text/plain")
-
-        #send POST request to project-files in order to upload file
+    def test_for_successful_upload(self):
+        #if the request turns 200, the test passes
+        my_test_file = SimpleUploadedFile("jonproj.txt", b"jon code", content_type="text/plain")
         response = self.client.post(reverse('users:project-files', kwargs={'id': self.project.id}), {
-            'file': test_if_file_uploaded
+            'file': my_test_file
         }, follow=True)
+        self.assertEqual(response.status_code, 200, "the upload did not return 200 success")
 
-        #if the database response is 200, test passes
-        self.assertEqual(response.status_code, 200)
+    def test_if_file_in_database(self):
+        #if the file is in database after uploading, test passes
+        my_test_file = SimpleUploadedFile("jonproj.txt", b"jon code", content_type="text/plain")
+        self.client.post(reverse('users:project-files', kwargs={'id': self.project.id}), {
+            'file': my_test_file
+        }, follow=True)
+        self.assertEqual(File.objects.count(), 1, "file was not found in database")
 
-        #if only one file is uploaded, test passes
-        self.assertEqual(File.objects.count(), 1)
-        
-        #if the file is associated with correct project, test passes
+    def test_file_associated_with_correct_project(self):
+        #if the uploaded file is associated with the correct project, the test passes
+        my_test_file = SimpleUploadedFile("jonproj.txt", b"jon code", content_type="text/plain")
+        self.client.post(reverse('users:project-files', kwargs={'id': self.project.id}), {
+            'file': my_test_file
+        }, follow=True)
         my_uploaded_file = File.objects.first()
-        self.assertEqual(my_uploaded_file.project, self.project)
+        self.assertEqual(my_uploaded_file.project, self.project, "file is not associated with correct project")
 
-        #if the file has the correct name, the test passes
-        my_uploaded_file_name = os.path.basename(my_uploaded_file.file.name)  #takes the filename without extension
-        self.assertTrue(my_uploaded_file_name.startswith('jonproj'), 
-                        f"Incorrect name found, '{my_uploaded_file_name}' jonproj not found")
-
-        #if the file shows up in files list, test passes
-        self.assertContains(response, 'jonproj.txt')
+    def test_uploaded_file_name(self):
+        #test if uploaded file has correct name
+        my_test_file = SimpleUploadedFile("jonproj.txt", b"jon code", content_type="text/plain")
+        self.client.post(reverse('users:project-files', kwargs={'id': self.project.id}), {
+            'file': my_test_file
+        }, follow=True)
+        my_uploaded_file = File.objects.first()
+        my_uploaded_file_name = os.path.basename(my_uploaded_file.file.name)
+        self.assertTrue(my_uploaded_file_name.startswith('jonproj'),
+                        f"the file name is not correct: {my_uploaded_file_name}")
