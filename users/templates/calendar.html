@@ -1,26 +1,54 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendar</title>
+    <title>Event Calendar</title>
     {% load bootstrap5 %}
     {% bootstrap_css %}
 </head>
 <body>
     <div class="container mt-5">
         <h2 class="text-center">Calendar - {{ today|date:"F" }} {{ year }}</h2>
+
+        {% if request.user.is_authenticated and request.user.profile.is_pma_admin %}
+            <a href="{% url 'users:create_event' %}" class="btn btn-primary mb-4">Create Event</a>
+        {% endif %}
+
         <div class="calendar">
             <div class="row">
-                {% for days in calendar_data %}
-                    <div class="col border">
-                        <h5>{{ days.day }}</h5>
-                        <p>nothing scheduled</p>
+               
+                {% for day in calendar_data %}
+                    <div class="col border p-2 text-center">
+                        <h5>{{ day.day }}</h5>
+
+                       
+                        {% if day.events %}
+                            <ul class="list-unstyled">
+                                {% for event in day.events %}
+                                    <li>
+                                        <strong>{{ event.name }}</strong> - {{ event.time|date:"H:i" }}
+                                        <p>{{ event.description }}</p>
+
+                                       
+                                        {% if request.user.is_authenticated and not request.user.profile.is_pma_admin %}
+                                            {% if event.id in user_rsvps %}
+                                                <a href="{% url 'users:rsvp_event' event.id %}" class="btn btn-sm btn-danger mt-1">Cancel RSVP</a>
+                                            {% else %}
+                                                <a href="{% url 'users:rsvp_event' event.id %}" class="btn btn-sm btn-success mt-1">RSVP</a>
+                                            {% endif %}
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No events scheduled</p>
+                        {% endif %}
                     </div>
+
                     {% if forloop.counter|divisibleby:7 %}
                         </div><div class="row">
                     {% endif %}
-                    
                 {% endfor %}
             </div>
         </div>

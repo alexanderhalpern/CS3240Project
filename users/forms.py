@@ -1,5 +1,5 @@
 from django import forms
-from .models import Profile, Project, File
+from .models import Profile, Project, File, Event, RSVP
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
@@ -15,3 +15,12 @@ class FileForm(forms.ModelForm):
     class Meta:
         model=File
         fields = ['file']
+
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = ['name', 'description', 'date', 'time']
+class RSVPForm(forms.ModelForm):
+    class Meta:
+        model = RSVP
+        fields = []

@@ -33,3 +33,19 @@ class File(models.Model):
 
     def __str__(self):
         return self.file.name
+
+class Event(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    date = models.DateField()
+    time = models.TimeField()
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name ='events_created')
+    def __str__(self):
+        return f"{self.name} on {self.date}"
+    
+class RSVP(models.Model):
+    event = models.ForeignKey(Event, related_name='rsvps', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='rsvps', on_delete=models.CASCADE)
+    status = models.BooleanField(default=True)
+    def __str__(self):
+        return f"{self.user.username} RSVP for {self.event.name}"

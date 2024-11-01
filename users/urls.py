@@ -10,5 +10,6 @@ urlpatterns = [
     path('calendar/', views.calendar_view, name='calendar'),
     path('<int:id>/', views.projectView, name='specific-project'),
     path('<int:id>/files/', views.filesView, name="project-files"),
-
+    path('event/<int:event_id>/rsvp/', views.rsvp_event, name='rsvp_event'),
+    path('event/create', views.create_event, name='create_event'),
 ]
