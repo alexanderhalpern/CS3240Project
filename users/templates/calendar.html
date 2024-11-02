@@ -31,6 +31,10 @@
             </div>
 
             <div class="row">
+                {% for _ in blank_days %}
+                    <div class="col border p-2 text-center"></div>
+                {% endfor %}
+                
                 {% for day in calendar_data %}
                     <div class="col border p-2 text-center">
                         <h5>{{ day.day }}</h5>

@@ -5,6 +5,7 @@ from .models import Profile, Project, Event, RSVP
 from .forms import ProfileUpdateForm, ProjectForm, FileForm, EventForm
 import datetime, calendar
 from calendar import monthrange
+from calendar import monthrange
 from django.http import HttpResponse, HttpResponseRedirect
 
 def is_admin(user):
@@ -60,8 +61,8 @@ def calendar_view(request):
     today = datetime.date.today()
     month = today.month
     year = today.year
-    calendar.setfirstweekday(calendar.MONDAY)
     start_day, num_days = monthrange(year, month)
+    blank_days = [None] * start_day
     
     # Get all events for the current month
     events = Event.objects.filter(date__year=year, date__month=month)
@@ -78,8 +79,8 @@ def calendar_view(request):
         'today': today,
         'year': year,
         'calendar_data': calendar_data,
+        'blank_days': blank_days,
         'user_rsvps': user_rsvps,
-        'start_day': start_day,
     }
     return render(request, 'calendar.html', context)
 
