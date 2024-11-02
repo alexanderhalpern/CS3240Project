@@ -1,0 +1,21 @@
+<header class="bg-primary text-white p-3 position-fixed top-0 start-0 w-100">
+    <div class="container">
+        <h1 class="h4 mb-0">Members of '{{project.name}}'</h1>
+    </div>
+</header>
+
+{% if is_owner %}
+    <button class="btn btn-primary position-fixed top-0 end-0 m-3">Add Member</button>
+{% else %}
+    <button class="btn btn-primary position-fixed top-0 end-0 m-3">Join Project</button>
+{% endif %}
+
+
+<ul>
+    {% for profile in member_profiles %}
+        <li>{{ profile.user.username }}</li>
+        {% if profile.is_pma_admin %}
+            <span>Admin</span>
+        {% endif %}
+    {% endfor %}
+</ul>
