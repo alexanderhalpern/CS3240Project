@@ -1,0 +1,9 @@
+<h2>Members of {{ project.name }}</h2>
+<ul>
+    {% for profile in member_profiles %}
+        <li>{{ profile.user.username }}</li>
+        {% if profile.is_pma_admin %}
+            <span>Admin</span>
+        {% endif %}
+    {% endfor %}
+</ul>

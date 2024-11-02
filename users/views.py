@@ -103,6 +103,17 @@ def filesView(request, id):
 
     return render(request, 'files.html', {'project': project, 'files': files, 'form': form})
 
+
+def membersView(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    members = project.members.all()  
+    member_profiles = [member.profile for member in members] 
+
+    return render(request, 'members.html', {
+        'project': project,
+        'member_profiles': member_profiles,
+    })
+
 @login_required
 def rsvp_event(request, event_id):
     if request.user.profile.is_pma_admin:
