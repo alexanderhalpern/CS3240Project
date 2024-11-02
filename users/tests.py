@@ -77,3 +77,11 @@ class FileUploadTest(TestCase):
 
     def test_correct_file_keyword(self):
         self.assertTrue()
+
+    def test_correct_club_membership(self):
+        self.assertTrue()
+
+    def test_keyword_search(self):
+        self.assertTrue()
+
+        
