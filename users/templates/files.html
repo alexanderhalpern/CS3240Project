@@ -26,8 +26,12 @@
         </div>
     </nav>
 
-
-
+    {% comment %} <form action="{% url 'users:project-files' project.id %}" method="GET">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Search for files" aria-label="Search for files" aria-describedby="search-files" name="q">
+            <button class="btn btn-outline-secondary" type="submit" id="search-files">Search</button>
+        </div>
+    </form> {% endcomment %}
 
     <div class="modal fade" id="addFileModal" tabindex="-1" aria-labelledby="addFileModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -40,6 +44,21 @@
                     <form action='.' method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                         {{ form.as_p }}
+                        <div class="mb-3">
+                            <label for="file_name" class="form-label">File Name</label>
+                            <input type="text" class="form-control" id="file_name" name="file_name" required>
+                        </div>
+    
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="keywords" class="form-label">Keywords</label>
+                            <textarea class="form-control" id="keywords" name="keywords" rows="3"></textarea>
+                        </div>
+                        
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
                 </div>
