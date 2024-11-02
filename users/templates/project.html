@@ -14,7 +14,7 @@
         <p>{{description}}</p>
         <div class="buttons">
             <a class="btn btn-primary btn-custom" href="{% url 'users:project-files' project.id %}">View Files</button> </a>
-            <button class="btn btn-primary btn-custom" href="{% url 'users:view-Members' project.id %}">Members</button>
+            <a class="btn btn-primary btn-custom" href="{% url 'users:view-members' project.id %}">Members</button> </a>
             <button class="btn btn-primary btn-custom" onclick=redirectToBooking()>Reserve Space</button>
         </div>
     </div>

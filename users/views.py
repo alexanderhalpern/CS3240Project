@@ -29,12 +29,15 @@ def main(request):
             project = form.save(commit=False)
             project.created_by = request.user
             project.save()
+            project.members.add(request.user)
+            project.save()
             return redirect('users:main')
     else:
         form = ProjectForm()
 
-    projects = Project.objects.all()
-    return render(request, "main.html", {'user': request.user, 'profile': profile, 'form': form, 'projects': projects})
+    user_projects = profile.user.created_projects.all()
+    other_projects = Project.objects.exclude(members=profile.user)
+    return render(request, "main.html", {'user': request.user, 'profile': profile, 'form': form, 'otherProjects': other_projects, 'userProjects': user_projects})
 
 
 @login_required
@@ -104,15 +107,14 @@ def filesView(request, id):
     return render(request, 'files.html', {'project': project, 'files': files, 'form': form})
 
 
-def membersView(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
+def membersView(request, id):
+    project = get_object_or_404(Project, id=id)
     members = project.members.all()  
     member_profiles = [member.profile for member in members] 
+    is_owner = project.created_by == request.user
+    #owner = project.created_by.first_name
 
-    return render(request, 'members.html', {
-        'project': project,
-        'member_profiles': member_profiles,
-    })
+    return render(request, 'members.html', { 'project': project,  'member_profiles': member_profiles, 'is_owner': is_owner})
 
 @login_required
 def rsvp_event(request, event_id):
