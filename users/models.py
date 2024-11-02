@@ -43,7 +43,6 @@ class File(models.Model):
     file_name = models.CharField(max_length=255, blank=True)
     file_size = models.PositiveIntegerField(blank=True, null=True)
     file_type = models.CharField(max_length=50, blank=True)
-    title = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     keywords = models.TextField(blank=True, null=True)
 

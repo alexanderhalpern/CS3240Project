@@ -7,6 +7,7 @@ import datetime
 from calendar import monthrange
 from django.http import HttpResponse, HttpResponseRedirect
 
+
 def is_admin(user):
     return user.is_authenticated and hasattr(user, 'profile') and user.profile.is_pma_admin
 
@@ -61,10 +62,11 @@ def calendar_view(request):
     month = today.month
     year = today.year
     start_day, num_days = monthrange(year, month)
-    
+
     # Get all events for the current month
     events = Event.objects.filter(date__year=year, date__month=month)
-    user_rsvps = RSVP.objects.filter(user=request.user).values_list('event_id', flat=True) if request.user.is_authenticated else []
+    user_rsvps = RSVP.objects.filter(user=request.user).values_list(
+        'event_id', flat=True) if request.user.is_authenticated else []
 
     # Initialize calendar data for each day of the month
     calendar_data = []
@@ -90,18 +92,22 @@ def projectView(request, id):
 def filesView(request, id):
     project = get_object_or_404(Project, id=id)
     form = FileForm(request.POST or None, request.FILES or None)
-    if request.method == 'POST':
 
-        if form.is_valid():
-            newFile = form.save(commit=False)
-            newFile.project = project
-            newFile.save()
-            # return HttpResponseRedirect(reverse("users:files"))  --> needs tweaking
-        else:
-            form = FileForm()
-    files = project.files.all()
+    if request.method == 'POST' and form.is_valid():
+        newFile = form.save(commit=False)
+        newFile.project = project
+        newFile.save()
+
+    query = request.GET.get('q')
+    print(project.files.all()[3].description)
+    if query:
+        files = project.files.filter(file_name__icontains=query) | project.files.filter(
+            description__icontains=query)
+    else:
+        files = project.files.all()
 
     return render(request, 'files.html', {'project': project, 'files': files, 'form': form})
+
 
 @login_required
 def rsvp_event(request, event_id):
@@ -126,6 +132,7 @@ def create_event(request):
     else:
         form = EventForm()
     return render(request, 'create_event.html', {'form': form})
+
 
 @user_passes_test(is_admin)
 def delete_event(request, event_id):
