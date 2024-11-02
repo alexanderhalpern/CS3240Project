@@ -9,6 +9,10 @@
 </head>
 <body>
     <div class="container mt-5">
+        <div class="mb-3">
+            <a href="{% url 'users:main' %}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+        
         <h2 class="text-center">Calendar - {{ today|date:"F" }} {{ year }}</h2>
 
         {% if request.user.is_authenticated and request.user.profile.is_pma_admin %}
