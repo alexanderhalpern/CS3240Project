@@ -4,7 +4,7 @@ from .models import Profile
 
 @receiver(user_logged_in)
 def assign_role_on_login(sender, request, user, **args):
-    admin_emails = ['karukavina@gmail.com'] #admin emails
+    admin_emails = ['karukavina@gmail.com', 'lkrill14@gmail.com'] #admin emails
 
     profile, created = Profile.objects.get_or_create(user=user)
 
