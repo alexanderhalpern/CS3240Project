@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 import os
 
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(blank=True, null=True)
@@ -25,7 +26,7 @@ class Project(models.Model):
         return self.name
 
 
-#class File(models.Model):
+# class File(models.Model):
 #    project = models.ForeignKey(
 #        Project, related_name='files', on_delete=models.CASCADE)
 #    file = models.FileField(upload_to='project_files/')
@@ -33,7 +34,7 @@ class Project(models.Model):
 #
 #    def __str__(self):
 #        return self.file.name
-    
+
 class File(models.Model):
     project = models.ForeignKey(
         'Project', related_name='files', on_delete=models.CASCADE)
@@ -42,6 +43,9 @@ class File(models.Model):
     file_name = models.CharField(max_length=255, blank=True)
     file_size = models.PositiveIntegerField(blank=True, null=True)
     file_type = models.CharField(max_length=50, blank=True)
+    title = models.CharField(max_length=255, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    keywords = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if self.file:
@@ -54,18 +58,25 @@ class File(models.Model):
     def __str__(self):
         return self.file_name
 
+
 class Event(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     date = models.DateField()
     time = models.TimeField()
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name ='events_created')
+    created_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='events_created')
+
     def __str__(self):
         return f"{self.name} on {self.date}"
-    
+
+
 class RSVP(models.Model):
-    event = models.ForeignKey(Event, related_name='rsvps', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, related_name='rsvps', on_delete=models.CASCADE)
+    event = models.ForeignKey(
+        Event, related_name='rsvps', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='rsvps',
+                             on_delete=models.CASCADE)
     status = models.BooleanField(default=True)
+
     def __str__(self):
         return f"{self.user.username} RSVP for {self.event.name}"
