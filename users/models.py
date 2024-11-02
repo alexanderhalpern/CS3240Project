@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+import os
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -25,14 +25,34 @@ class Project(models.Model):
         return self.name
 
 
+#class File(models.Model):
+#    project = models.ForeignKey(
+#        Project, related_name='files', on_delete=models.CASCADE)
+#    file = models.FileField(upload_to='project_files/')
+#    upload_date = models.DateTimeField(auto_now_add=True)
+#
+#    def __str__(self):
+#        return self.file.name
+    
 class File(models.Model):
     project = models.ForeignKey(
-        Project, related_name='files', on_delete=models.CASCADE)
+        'Project', related_name='files', on_delete=models.CASCADE)
     file = models.FileField(upload_to='project_files/')
     upload_date = models.DateTimeField(auto_now_add=True)
+    file_name = models.CharField(max_length=255, blank=True)
+    file_size = models.PositiveIntegerField(blank=True, null=True)
+    file_type = models.CharField(max_length=50, blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.file:
+            self.file_name = self.file.name
+            self.file_size = self.file.size
+            self.file_type = os.path.splitext(self.file.name)[1][1:]
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.file.name
+        return self.file_name
 
 class Event(models.Model):
     name = models.CharField(max_length=100)
