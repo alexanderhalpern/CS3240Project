@@ -127,6 +127,12 @@ def create_event(request):
         form = EventForm()
     return render(request, 'create_event.html', {'form': form})
 
+@user_passes_test(is_admin)
+def delete_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id, created_by=request.user)
+    event.delete()
+    return redirect('users:calendar')
+
 
 def logout_view(request):
     logout(request)

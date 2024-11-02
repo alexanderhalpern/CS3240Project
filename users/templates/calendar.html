@@ -30,7 +30,30 @@
                                         <strong>{{ event.name }}</strong> - {{ event.time|date:"H:i" }}
                                         <p>{{ event.description }}</p>
 
-                                       
+                                        {% if request.user.is_authenticated and request.user.profile.is_pma_admin %}
+                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ event.id }}">
+                                                Delete
+                                            </button>
+
+                                            <div class="modal fade" id="deleteModal{{ event.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ event.id }}" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="deleteModalLabel{{ event.id }}">Confirm Delete</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            Are you sure you want to delete this event?
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                            <a href="{% url 'users:delete_event' event.id %}" class="btn btn-danger">Delete</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
                                         {% if request.user.is_authenticated and not request.user.profile.is_pma_admin %}
                                             {% if event.id in user_rsvps %}
                                                 <a href="{% url 'users:rsvp_event' event.id %}" class="btn btn-sm btn-danger mt-1">Cancel RSVP</a>
