@@ -3,7 +3,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Profile, Project, Event, RSVP
 from .forms import ProfileUpdateForm, ProjectForm, FileForm, EventForm
-import datetime
+import datetime, calendar
 from calendar import monthrange
 from django.http import HttpResponse, HttpResponseRedirect
 
@@ -60,6 +60,7 @@ def calendar_view(request):
     today = datetime.date.today()
     month = today.month
     year = today.year
+    calendar.setfirstweekday(calendar.MONDAY)
     start_day, num_days = monthrange(year, month)
     
     # Get all events for the current month
@@ -78,6 +79,7 @@ def calendar_view(request):
         'year': year,
         'calendar_data': calendar_data,
         'user_rsvps': user_rsvps,
+        'start_day': start_day,
     }
     return render(request, 'calendar.html', context)
 
