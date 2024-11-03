@@ -1,3 +1,4 @@
+import datetime
 from django.test import TestCase
 
 import os
@@ -64,24 +65,105 @@ class FileUploadTest(TestCase):
                         f"the file name is not correct: {my_uploaded_file_name}")
     
     def test_correct_timestamp(self):
-        self.assertTrue()
+        self.client.post(
+            reverse('users:project-files', kwargs={'id': self.project.id}),
+            self.test_file_data,
+            follow=True
+        )
+        my_uploaded_file = File.objects.first()
+        
+        self.assertIsNotNone(my_uploaded_file.upload_date, "Upload date was not set")
+        time_diff = datetime.now().timestamp() - my_uploaded_file.upload_date.timestamp()
+        self.assertTrue(time_diff < 60, "Upload timestamp is not recent")
 
-    def test_correct_file_name(self):
-        self.assertTrue()
+    def test_correct_file_metadata(self):
+        self.client.post(
+            reverse('users:project-files', kwargs={'id': self.project.id}),
+            self.test_file_data,
+            follow=True
+        )
+        my_uploaded_file = File.objects.first()
+        
+        self.assertEqual(my_uploaded_file.title, 'Test Document',
+                        "Title was not correctly saved")
+        self.assertEqual(my_uploaded_file.description, 'This is a test document',
+                        "Description was not correctly saved")
+        self.assertEqual(my_uploaded_file.keywords, 'test,document,upload',
+                        "Keywords were not correctly saved")
 
     def test_correct_file_size(self):
-        self.assertTrue()
+        self.client.post(
+            reverse('users:project-files', kwargs={'id': self.project.id}),
+            self.test_file_data,
+            follow=True
+        )
+        my_uploaded_file = File.objects.first()
+        
+        self.assertEqual(my_uploaded_file.file_size, len(b"jon code"),
+                        "File size was not correctly saved in the database")
     
     def test_correct_file_type(self):
-        self.assertTrue()
+        self.client.post(
+            reverse('users:project-files', kwargs={'id': self.project.id}),
+            self.test_file_data,
+            follow=True
+        )
+        my_uploaded_file = File.objects.first()
+        
+        self.assertEqual(my_uploaded_file.file_type, "txt",
+                        "File type was not correctly saved in the database")
 
-    def test_correct_file_keyword(self):
-        self.assertTrue()
+    def test_missing_required_fields(self):
+        #testing without a title
+        invalid_data = self.test_file_data.copy()
+        invalid_data.pop('title')
+        response = self.client.post(
+            reverse('users:project-files', kwargs={'id': self.project.id}),
+            invalid_data,
+            follow=True
+        )
+        self.assertFormError(response, 'form', 'title', 'This field is required.')
 
     def test_correct_club_membership(self):
-        self.assertTrue()
+        #create non-member user
+        non_member = User.objects.create_user(username='nonmember', password='password123')
+        self.client.logout()
+        self.client.login(username='nonmember', password='password123')
+        
+        response = self.client.post(
+            reverse('users:project-files', kwargs={'id': self.project.id}),
+            self.test_file_data,
+            follow=True
+        )
+        
+        self.assertNotEqual(response.status_code, 200,
+                          "Non-member was able to upload file to project")
 
     def test_keyword_search(self):
-        self.assertTrue()
+        #instantiate dummy files with multiple keywords
+        files_data = [
+            {**self.test_file_data, 'keywords': 'python,django,test'},
+            {**self.test_file_data, 'keywords': 'python,upload'},
+            {**self.test_file_data, 'keywords': 'test,upload'}
+        ]
+        
+        for file_data in files_data:
+            file_data['file'] = SimpleUploadedFile(
+                "test.txt", 
+                b"test content", 
+                content_type="text/plain"
+            )
+            self.client.post(
+                reverse('users:project-files', kwargs={'id': self.project.id}),
+                file_data,
+                follow=True
+            )
+        
+        #tests if files are retrieved with "python" as the keyword
+        response = self.client.get(
+            reverse('users:project-files', kwargs={'id': self.project.id}) + '?keyword=python'
+        )
+        self.assertEqual(len(response.context['files']), 2,
+                        "Keyword search did not return correct number of files")
 
         
