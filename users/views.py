@@ -98,6 +98,11 @@ def projectView(request, id):
 
 def filesView(request, id):
     project = get_object_or_404(Project, id=id)
+    
+    # Add authorization check for club membership
+    if request.user not in project.members.all():
+        return HttpResponse(status=403)  # Or redirect to an error page
+    
     form = FileForm(request.POST or None, request.FILES or None)
 
     if request.method == 'POST' and form.is_valid():
@@ -111,18 +116,12 @@ def filesView(request, id):
         newFile.keywords = request.POST.get('keywords')
         newFile.save()
 
-    query = request.GET.get('q')
+    # New keyword search logic
+    keyword = request.GET.get('keyword')
     files = project.files.all()
-    if len(files) > 3:
-        print(files[3].description)
-    if query:
-        files = project.files.filter(file_name__icontains=query) | \
-            project.files.filter(description__icontains=query) | \
-            project.files.filter(keywords__icontains=query) | \
-            project.files.filter(title__icontains=query) | \
-            project.files.filter(file_type__icontains=query) | \
-            project.files.filter(upload_date__icontains=query)
-
+    
+    if keyword:
+        files = project.files.filter(keywords__icontains=keyword)
     else:
         files = project.files.all()
 
