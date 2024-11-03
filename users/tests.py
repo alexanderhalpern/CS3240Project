@@ -101,7 +101,9 @@ class FileUploadTest(TestCase):
         my_uploaded_file = File.objects.first()
         
         self.assertIsNotNone(my_uploaded_file.upload_date)
-        time_diff = datetime.datetime.now(datetime.UTC).timestamp() - my_uploaded_file.upload_date.timestamp()
+        # Use timezone.now() instead of datetime.datetime.now(datetime.UTC)
+        from django.utils import timezone
+        time_diff = timezone.now().timestamp() - my_uploaded_file.upload_date.timestamp()
         self.assertTrue(time_diff < 60)
 
     def test_correct_file_metadata(self):
