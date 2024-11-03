@@ -15,8 +15,6 @@ class FileForm(forms.ModelForm):
     class Meta:
         model = File
         fields = ['file', 'title', 'description', 'keywords']
-        # Make title required
-        required = ['file', 'title']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render, redirect,  get_object_or_404, reverse
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -101,8 +102,8 @@ def filesView(request, id):
     project = get_object_or_404(Project, id=id)
     
     # Add authorization check
-    if request.user not in project.members.all():
-        return HttpResponse(status=403)  # Return forbidden status for non-members
+    if not request.user.is_authenticated or request.user not in project.members.all():
+        return HttpResponse(status=403)
         
     form = FileForm(request.POST or None, request.FILES or None)
 
@@ -111,19 +112,25 @@ def filesView(request, id):
         newFile.project = project
         newFile.file_name = request.FILES['file'].name
         newFile.file_size = request.FILES['file'].size
-        newFile.file_type = request.FILES['file'].content_type
+        newFile.file_type = os.path.splitext(request.FILES['file'].name)[1][1:]  # Get extension without dot
+        newFile.title = form.cleaned_data.get('title')
+        newFile.description = form.cleaned_data.get('description')
+        newFile.keywords = form.cleaned_data.get('keywords')
         newFile.save()
+        return redirect('users:project-files', id=project.id)
 
-    # Modified keyword search logic
     keyword = request.GET.get('keyword')
-    files = project.files.all()
-    
     if keyword:
         files = project.files.filter(keywords__icontains=keyword)
     else:
         files = project.files.all()
 
-    return render(request, 'files.html', {'project': project, 'files': files, 'form': form})
+    context = {
+        'project': project,
+        'files': files,
+        'form': form
+    }
+    return render(request, 'files.html', context)
 
 
 def membersView(request, id):

@@ -21,6 +21,8 @@ class FileUploadTest(TestCase):
         
         #mocks project
         self.project = Project.objects.create(name='Jon Project', description='Jon code', created_by=self.user)
+        # Add user as member of the project
+        self.project.members.add(self.user)  # Add this line
         
         #set up file data
         self.test_file = SimpleUploadedFile(
@@ -172,28 +174,36 @@ class FileUploadTest(TestCase):
     def test_keyword_search(self):
         #instantiate dummy files with multiple keywords
         files_data = [
-            {**self.test_file_data, 'keywords': 'python,django,test'},
-            {**self.test_file_data, 'keywords': 'python,upload'},
-            {**self.test_file_data, 'keywords': 'test,upload'}
+            {
+                'file': SimpleUploadedFile("test1.txt", b"test content", content_type="text/plain"),
+                'title': 'Test 1',
+                'description': 'Test description 1',
+                'keywords': 'python,django,test'
+            },
+            {
+                'file': SimpleUploadedFile("test2.txt", b"test content", content_type="text/plain"),
+                'title': 'Test 2',
+                'description': 'Test description 2',
+                'keywords': 'python,upload'
+            },
+            {
+                'file': SimpleUploadedFile("test3.txt", b"test content", content_type="text/plain"),
+                'title': 'Test 3',
+                'description': 'Test description 3',
+                'keywords': 'test,upload'
+            }
         ]
         
         for file_data in files_data:
-            file_data['file'] = SimpleUploadedFile(
-                "test.txt", 
-                b"test content", 
-                content_type="text/plain"
-            )
             self.client.post(
                 reverse('users:project-files', kwargs={'id': self.project.id}),
                 file_data,
                 follow=True
             )
         
-        #tests if files are retrieved with "python" as the keyword
         response = self.client.get(
             reverse('users:project-files', kwargs={'id': self.project.id}) + '?keyword=python'
         )
-        self.assertEqual(len(response.context['files']), 2,
-                        "Keyword search did not return correct number of files")
+        self.assertEqual(len(response.context['files']), 2)
 
         
