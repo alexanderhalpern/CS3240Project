@@ -1,69 +1,97 @@
 import datetime
-from django.test import TestCase
-
+from django.test import TestCase, override_settings
 import os
-
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth.models import User
 from django.urls import reverse
-
+from django.conf import settings
 from .models import Project, File
 
-class FileUploadTest(TestCase):
+#create directory just for testing
+TEST_MEDIA_ROOT = os.path.join(settings.BASE_DIR, 'test_media')
+os.makedirs(TEST_MEDIA_ROOT, exist_ok=True)
 
+@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
+@override_settings(DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
+class FileUploadTest(TestCase):
     def setUp(self):
         #mocks user
         self.user = User.objects.create_user(username='jonfox', password='bigbrain9')
-        self.client.login(username='jonfox', password='bigbrain9')  #logs user in
+        self.client.login(username='jonfox', password='bigbrain9')
         
         #mocks project
         self.project = Project.objects.create(name='Jon Project', description='Jon code', created_by=self.user)
+        
+        #set up file data
+        self.test_file = SimpleUploadedFile(
+            "test.txt",
+            b"jon code",
+            content_type="text/plain"
+        )
+        self.test_file_data = {
+            'file': self.test_file,
+            'title': 'Test Document',
+            'description': 'This is a test document',
+            'keywords': 'test,document,upload'
+        }
 
     def tearDown(self):
-        #since the test always creates an example file, this helper function just removes it
-        for uploaded_file in File.objects.all():
-            if uploaded_file.file:
-                file_path = uploaded_file.file.path
-                if os.path.exists(file_path):
-                    os.remove(file_path) #deletes file
+        #clean up all uploaded files
+        try:
+            for uploaded_file in File.objects.all():
+                if uploaded_file.file:
+                    if os.path.isfile(uploaded_file.file.path):
+                        os.remove(uploaded_file.file.path)
+        except Exception:
+            pass  #ignore all errors during cleanup
+            
+        #remove media directory
+        if os.path.exists(TEST_MEDIA_ROOT):
+            for root, dirs, files in os.walk(TEST_MEDIA_ROOT, topdown=False):
+                for name in files:
+                    os.remove(os.path.join(root, name))
+                for name in dirs:
+                    os.rmdir(os.path.join(root, name))
+            os.rmdir(TEST_MEDIA_ROOT)
+            
         super().tearDown()
 
     def test_for_successful_upload(self):
-        #if the request turns 200, the test passes
-        my_test_file = SimpleUploadedFile("jonproj.txt", b"jon code", content_type="text/plain")
-        response = self.client.post(reverse('users:project-files', kwargs={'id': self.project.id}), {
-            'file': my_test_file
-        }, follow=True)
-        self.assertEqual(response.status_code, 200, "the upload did not return 200 success")
+        response = self.client.post(
+            reverse('users:project-files', kwargs={'id': self.project.id}),
+            self.test_file_data,
+            follow=True
+        )
+        self.assertEqual(response.status_code, 200)
 
     def test_if_file_in_database(self):
-        #if the file is in database after uploading, test passes
-        my_test_file = SimpleUploadedFile("jonproj.txt", b"jon code", content_type="text/plain")
-        self.client.post(reverse('users:project-files', kwargs={'id': self.project.id}), {
-            'file': my_test_file
-        }, follow=True)
-        self.assertEqual(File.objects.count(), 1, "file was not found in database")
+        self.client.post(
+            reverse('users:project-files', kwargs={'id': self.project.id}),
+            self.test_file_data,
+            follow=True
+        )
+        self.assertEqual(File.objects.count(), 1)
 
     def test_file_associated_with_correct_project(self):
-        #if the uploaded file is associated with the correct project, the test passes
-        my_test_file = SimpleUploadedFile("jonproj.txt", b"jon code", content_type="text/plain")
-        self.client.post(reverse('users:project-files', kwargs={'id': self.project.id}), {
-            'file': my_test_file
-        }, follow=True)
+        self.client.post(
+            reverse('users:project-files', kwargs={'id': self.project.id}),
+            self.test_file_data,
+            follow=True
+        )
         my_uploaded_file = File.objects.first()
-        self.assertEqual(my_uploaded_file.project, self.project, "file is not associated with correct project")
+        self.assertEqual(my_uploaded_file.project, self.project)
 
     def test_uploaded_file_name(self):
-        #test if uploaded file has correct name
-        my_test_file = SimpleUploadedFile("jonproj.txt", b"jon code", content_type="text/plain")
-        self.client.post(reverse('users:project-files', kwargs={'id': self.project.id}), {
-            'file': my_test_file
-        }, follow=True)
+        self.client.post(
+            reverse('users:project-files', kwargs={'id': self.project.id}),
+            self.test_file_data,
+            follow=True
+        )
         my_uploaded_file = File.objects.first()
         my_uploaded_file_name = os.path.basename(my_uploaded_file.file.name)
-        self.assertTrue(my_uploaded_file_name.startswith('jonproj'),
-                        f"the file name is not correct: {my_uploaded_file_name}")
-    
+        self.assertTrue(my_uploaded_file_name.startswith('test'),
+                       f"the file name is not correct: {my_uploaded_file_name}")
+
     def test_correct_timestamp(self):
         self.client.post(
             reverse('users:project-files', kwargs={'id': self.project.id}),
@@ -72,9 +100,9 @@ class FileUploadTest(TestCase):
         )
         my_uploaded_file = File.objects.first()
         
-        self.assertIsNotNone(my_uploaded_file.upload_date, "Upload date was not set")
-        time_diff = datetime.now().timestamp() - my_uploaded_file.upload_date.timestamp()
-        self.assertTrue(time_diff < 60, "Upload timestamp is not recent")
+        self.assertIsNotNone(my_uploaded_file.upload_date)
+        time_diff = datetime.datetime.now(datetime.UTC).timestamp() - my_uploaded_file.upload_date.timestamp()
+        self.assertTrue(time_diff < 60)
 
     def test_correct_file_metadata(self):
         self.client.post(
