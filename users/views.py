@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Profile, Project, Event, RSVP
 from .forms import ProfileUpdateForm, ProjectForm, FileForm, EventForm
 import datetime
+import calendar
+from calendar import monthrange
 from calendar import monthrange
 from django.http import HttpResponse, HttpResponseRedirect
 
@@ -30,12 +32,15 @@ def main(request):
             project = form.save(commit=False)
             project.created_by = request.user
             project.save()
+            project.members.add(request.user)
+            project.save()
             return redirect('users:main')
     else:
         form = ProjectForm()
 
-    projects = Project.objects.all()
-    return render(request, "main.html", {'user': request.user, 'profile': profile, 'form': form, 'projects': projects})
+    user_projects = profile.user.created_projects.all()
+    other_projects = Project.objects.exclude(members=profile.user)
+    return render(request, "main.html", {'user': request.user, 'profile': profile, 'form': form, 'otherProjects': other_projects, 'userProjects': user_projects})
 
 
 @login_required
@@ -62,6 +67,7 @@ def calendar_view(request):
     month = today.month
     year = today.year
     start_day, num_days = monthrange(year, month)
+    blank_days = [None] * start_day
 
     # Get all events for the current month
     events = Event.objects.filter(date__year=year, date__month=month)
@@ -79,6 +85,7 @@ def calendar_view(request):
         'today': today,
         'year': year,
         'calendar_data': calendar_data,
+        'blank_days': blank_days,
         'user_rsvps': user_rsvps,
     }
     return render(request, 'calendar.html', context)
@@ -107,6 +114,16 @@ def filesView(request, id):
         files = project.files.all()
 
     return render(request, 'files.html', {'project': project, 'files': files, 'form': form})
+
+
+def membersView(request, id):
+    project = get_object_or_404(Project, id=id)
+    members = project.members.all()
+    member_profiles = [member.profile for member in members]
+    is_owner = project.created_by == request.user
+    # owner = project.created_by.first_name
+
+    return render(request, 'members.html', {'project': project,  'member_profiles': member_profiles, 'is_owner': is_owner})
 
 
 @login_required

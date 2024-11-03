@@ -63,11 +63,24 @@
 
          <!-- show clickable list of projects -->
         <div class="content">
-            <h1>Projects</h1>
+            <h1>My Projects</h1>
     
-            {% if projects %}
+            {% if userProjects %}
                 <ul>
-                    {% for p in projects %}
+                    {% for p in userProjects %}
+                        <li><a href="{% url 'users:specific-project' p.id %}">{{ p.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No projects yet.</p>
+            {% endif %}
+        </div>
+        <div class="content"></div>
+            <h1>Other Projects</h1>
+    
+            {% if otherProjects %}
+                <ul>
+                    {% for p in otherProjects %}
                         <li><a href="{% url 'users:specific-project' p.id %}">{{ p.name }}</a></li>
                     {% endfor %}
                 </ul>

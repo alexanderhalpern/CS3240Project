@@ -21,7 +21,20 @@
 
         <div class="calendar">
             <div class="row">
-               
+                <div class="col">Monday</div>
+                <div class="col">Tuesday</div>
+                <div class="col">Wednesday</div>
+                <div class="col">Thursday</div>
+                <div class="col">Friday</div>
+                <div class="col">Saturday</div>
+                <div class="col">Sunday</div>
+            </div>
+
+            <div class="row">
+                {% for _ in blank_days %}
+                    <div class="col border p-2 text-center"></div>
+                {% endfor %}
+                
                 {% for day in calendar_data %}
                     <div class="col border p-2 text-center">
                         <h5>{{ day.day }}</h5>
