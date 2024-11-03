@@ -62,3 +62,26 @@ class FileUploadTest(TestCase):
         my_uploaded_file_name = os.path.basename(my_uploaded_file.file.name)
         self.assertTrue(my_uploaded_file_name.startswith('jonproj'),
                         f"the file name is not correct: {my_uploaded_file_name}")
+    
+    def test_correct_timestamp(self):
+        self.assertTrue()
+
+    def test_correct_file_name(self):
+        self.assertTrue()
+
+    def test_correct_file_size(self):
+        self.assertTrue()
+    
+    def test_correct_file_type(self):
+        self.assertTrue()
+
+    def test_correct_file_keyword(self):
+        self.assertTrue()
+
+    def test_correct_club_membership(self):
+        self.assertTrue()
+
+    def test_keyword_search(self):
+        self.assertTrue()
+
+        
