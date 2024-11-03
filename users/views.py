@@ -96,13 +96,24 @@ def filesView(request, id):
     if request.method == 'POST' and form.is_valid():
         newFile = form.save(commit=False)
         newFile.project = project
+        newFile.file_name = request.FILES['file'].name
+        newFile.file_size = request.FILES['file'].size
+        newFile.file_type = request.FILES['file'].content_type
+        newFile.title = request.POST.get('title')
+        newFile.description = request.POST.get('description')
+        newFile.keywords = request.POST.get('keywords')
         newFile.save()
 
     query = request.GET.get('q')
     print(project.files.all()[3].description)
     if query:
-        files = project.files.filter(file_name__icontains=query) | project.files.filter(
-            description__icontains=query)
+        files = project.files.filter(file_name__icontains=query) | \
+            project.files.filter(description__icontains=query) | \
+            project.files.filter(keywords__icontains=query) | \
+            project.files.filter(title__icontains=query) | \
+            project.files.filter(file_type__icontains=query) | \
+            project.files.filter(upload_date__icontains=query)
+
     else:
         files = project.files.all()
 
