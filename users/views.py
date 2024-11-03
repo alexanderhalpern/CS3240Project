@@ -96,13 +96,14 @@ def projectView(request, id):
     return render(request, 'project.html', {'description': project.description, 'project': project})
 
 
+@login_required
 def filesView(request, id):
     project = get_object_or_404(Project, id=id)
     
-    # Add authorization check for club membership
+    # Add authorization check
     if request.user not in project.members.all():
-        return HttpResponse(status=403)  # Or redirect to an error page
-    
+        return HttpResponse(status=403)  # Return forbidden status for non-members
+        
     form = FileForm(request.POST or None, request.FILES or None)
 
     if request.method == 'POST' and form.is_valid():
@@ -111,12 +112,9 @@ def filesView(request, id):
         newFile.file_name = request.FILES['file'].name
         newFile.file_size = request.FILES['file'].size
         newFile.file_type = request.FILES['file'].content_type
-        newFile.title = request.POST.get('title')
-        newFile.description = request.POST.get('description')
-        newFile.keywords = request.POST.get('keywords')
         newFile.save()
 
-    # New keyword search logic
+    # Modified keyword search logic
     keyword = request.GET.get('keyword')
     files = project.files.all()
     

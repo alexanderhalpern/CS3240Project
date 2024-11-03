@@ -13,8 +13,16 @@ class ProjectForm(forms.ModelForm):
 
 class FileForm(forms.ModelForm):
     class Meta:
-        model=File
-        fields = ['file']
+        model = File
+        fields = ['file', 'title', 'description', 'keywords']
+        # Make title required
+        required = ['file', 'title']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['title'].required = True
+        self.fields['description'].required = False
+        self.fields['keywords'].required = False
 
 class EventForm(forms.ModelForm):
     class Meta:
