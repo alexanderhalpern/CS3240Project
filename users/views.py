@@ -112,7 +112,9 @@ def filesView(request, id):
         newFile.save()
 
     query = request.GET.get('q')
-    print(project.files.all()[3].description)
+    files = project.files.all()
+    if len(files) > 3:
+        print(files[3].description)
     if query:
         files = project.files.filter(file_name__icontains=query) | \
             project.files.filter(description__icontains=query) | \
