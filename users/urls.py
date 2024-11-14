@@ -19,5 +19,11 @@ urlpatterns = [
          views.project_modal, name='project-modal'),
     path('projects/<int:project_id>/delete/',
          views.delete_project, name='delete-project'),
+    path('projects/<int:project_id>/members/add/',
+         views.add_member, name='add-member'),
+    path('projects/<int:project_id>/members/<int:user_id>/remove/',
+         views.remove_member, name='remove-member'),
+    path('projects/<int:project_id>/join/',
+         views.join_project, name='join-project'),
 
 ]

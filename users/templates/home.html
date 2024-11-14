@@ -7,34 +7,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}ClubHub{% endblock %}</title>
+    <title>{% block title %}Welcome to ClubHub{% endblock %}</title>
     
     {% bootstrap_css %}
-    
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #FF7F00 0%, #FF5733 100%);
+            display: flex;
+            align-items: center;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            padding: 2rem 0;
+        }
+
+        .signin-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 3rem !important;
+        }
+
+        .brand-text {
+            font-size: 1.8rem;
+            font-weight: 600;
+            background: linear-gradient(45deg, #232D4B, #FF7F00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .google-signin-button {
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+
+        .google-signin-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 2rem 0;
+            color: #666;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #eee;
+        }
+
+        .divider span {
+            padding: 0 1rem;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            color: #FF7F00;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-uva-orange">
+    <div class="login-wrapper">
         <div class="container">
-            <a class="navbar-brand" href="#">ClubHub</a>
-        </div>
-    </nav>
+            <div class="row justify-content-center">
+                <div class="col-lg-5 col-md-7">
+                    <div class="signin-container">
+                        <div class="text-center mb-4">
+                            <img src="{% static 'images/clubhub.png' %}" alt="ClubHub Logo" class="img-fluid mb-4" style="height: 70px;" />
+                            <h1 class="brand-text">Welcome to ClubHub</h1>
+                            <p class="subtitle">Your Centralized CIO Management System</p>
+                        </div>
+                        
+                        <div class="d-flex justify-content-center">
+                            <a href="{% provider_login_url 'google' %}?next=/" class="google-signin-button">
+                                <img src="{% static 'images/google_signin.svg' %}" alt="Sign in with Google" class="img-fluid" />
+                            </a>
+                        </div>
 
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="signin-container p-5">
-                    <h1 class="text-center mb-4">Welcome to ClubHub</h1>
-                    <p class="text-center mb-5">Centralized CIO Management System</p>
-                    
-                    <div class="text-center mb-4">
-                        <p>Sign in to access your account</p>
-                    </div>
-                    
-                    <div class="d-flex justify-content-center align-items-center w-100">
-                        <a href="{% provider_login_url 'google' %}?next=/" class="google-signin-button">
-                            <img src="{% static 'images/google_signin.svg' %}" alt="Sign in with Google" class="img-fluid" />
-                        </a>
+                        <div class="divider">
+                            <span>Why ClubHub?</span>
+                        </div>
+
+                        <div class="features">
+                            <div class="feature-item">
+                                <i class="bi bi-calendar-check feature-icon"></i>
+                                <div>
+                                    <h6 class="mb-1">Event Management</h6>
+                                    <small class="text-muted">Schedule and track events easily</small>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <i class="bi bi-people feature-icon"></i>
+                                <div>
+                                    <h6 class="mb-1">Team Collaboration</h6>
+                                    <small class="text-muted">Work together seamlessly</small>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <i class="bi bi-folder feature-icon"></i>
+                                <div>
+                                    <h6 class="mb-1">File Sharing</h6>
+                                    <small class="text-muted">Share and organize documents</small>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <i class="bi bi-shield-check feature-icon"></i>
+                                <div>
+                                    <h6 class="mb-1">Secure Access</h6>
+                                    <small class="text-muted">Protected by Google login</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

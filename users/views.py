@@ -9,6 +9,8 @@ import calendar
 from calendar import monthrange
 from calendar import monthrange
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.contrib import messages
+from django.contrib.auth.models import User
 
 
 def is_admin(user):
@@ -162,11 +164,13 @@ def filesView(request, id):
 def membersView(request, id):
     project = get_object_or_404(Project, id=id)
     members = project.members.all()
-    member_profiles = [member.profile for member in members]
     is_owner = project.created_by == request.user
-    # owner = project.created_by.first_name
 
-    return render(request, 'members.html', {'project': project,  'member_profiles': member_profiles, 'is_owner': is_owner})
+    return render(request, 'members.html', {
+        'project': project,
+        'members': members,  # Pass the users directly
+        'is_owner': is_owner
+    })
 
 
 @login_required
@@ -204,3 +208,59 @@ def delete_event(request, event_id):
 def logout_view(request):
     logout(request)
     return redirect("home")
+
+
+@login_required
+def add_member(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    if request.user != project.created_by:
+        messages.error(request, "You don't have permission to add members.")
+        return redirect('users:view-members', project_id)
+
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = User.objects.get(email=email)
+            if user not in project.members.all():
+                project.members.add(user)
+                messages.success(
+                    request, f'{user.email} has been added to the project.')
+            else:
+                messages.warning(request, f'{user.email} is already a member.')
+        except User.DoesNotExist:
+            messages.error(request, f'No user found with email {email}.')
+
+    return redirect('users:view-members', project_id)
+
+
+@login_required
+def remove_member(request, project_id, user_id):
+    project = get_object_or_404(Project, id=project_id)
+    if request.user != project.created_by:
+        messages.error(request, "You don't have permission to remove members.")
+        return redirect('users:view-members', project_id)
+
+    if request.method == 'POST':
+        user_to_remove = get_object_or_404(User, id=user_id)
+        if user_to_remove == project.created_by:
+            messages.error(request, "Cannot remove the project owner.")
+        else:
+            project.members.remove(user_to_remove)
+            messages.success(
+                request, f'{user_to_remove.email} has been removed from the project.')
+
+    return redirect('users:view-members', project_id)
+
+
+@login_required
+def join_project(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    if request.method == 'POST':
+        if request.user not in project.members.all():
+            project.members.add(request.user)
+            messages.success(request, 'You have joined the project.')
+        else:
+            messages.warning(
+                request, 'You are already a member of this project.')
+
+    return redirect('users:view-members', project_id)

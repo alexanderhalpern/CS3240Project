@@ -1,21 +1,110 @@
-<header class="bg-primary text-white p-3 position-fixed top-0 start-0 w-100">
-    <div class="container">
-        <h1 class="h4 mb-0">Members of '{{project.name}}'</h1>
-    </div>
-</header>
+{% extends 'base.html' %}
+{% load static %}
 
-{% if is_owner %}
-    <button class="btn btn-primary position-fixed top-0 end-0 m-3">Add Member</button>
-{% else %}
-    <button class="btn btn-primary position-fixed top-0 end-0 m-3">Join Project</button>
-{% endif %}
+{% block title %}Members - {{ project.name }} - ClubHub{% endblock %}
 
-
-<ul>
-    {% for profile in member_profiles %}
-        <li>{{ profile.user.username }}</li>
-        {% if profile.is_pma_admin %}
-            <span>Admin</span>
+{% block content %}
+<div class="container">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <a href="{% url 'users:main' %}" class="btn btn-outline-primary me-3">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+        <h1 class="mb-0">Members of {{ project.name }}</h1>
+        {% if is_owner %}
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+                <i class="bi bi-person-plus me-2"></i>Add Member
+            </button>
+        {% else %}
+            <form action="{% url 'users:join-project' project.id %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-person-plus me-2"></i>Join Project
+                </button>
+            </form>
         {% endif %}
-    {% endfor %}
-</ul>
+    </div>
+
+    <div class="row">
+        {% for user in members %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            {% if user.profile %}
+                                {% if user.profile.profile_picture %}
+                                    <img src="{{ user.profile.profile_picture.url }}" class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover;" alt="Profile Picture">
+                                {% else %}
+                                    <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                        <i class="bi bi-person text-primary"></i>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="rounded-circle bg-warning bg-opacity-10 d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-person-x text-warning"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="flex-grow-1">
+                                {% if user.profile %}
+                                    <h5 class="mb-1">{{ user.first_name|default:user.email }}</h5>
+                                    <p class="text-muted mb-0">{{ user.email }}</p>
+                                    {% if user.profile.is_pma_admin %}
+                                        <span class="badge bg-primary mt-1">Admin</span>
+                                    {% endif %}
+                                {% else %}
+                                    <h5 class="mb-1">{{ user.email }}</h5>
+                                    <span class="badge bg-warning text-dark mt-1">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>No Profile
+                                    </span>
+                                {% endif %}
+                            </div>
+                            
+                            {% if is_owner and user != project.created_by %}
+                                <form action="{% url 'users:remove-member' project.id user.id %}" method="POST" class="ms-2">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" 
+                                            onclick="return confirm('Are you sure you want to remove this member?');">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                                              </svg>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+{% if is_owner %}
+<div class="modal fade" id="addMemberModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Member to {{ project.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'users:add-member' project.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="email" class="form-label">User Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                        <div class="form-text">Enter the email address of the user you want to add</div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Add Member</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
