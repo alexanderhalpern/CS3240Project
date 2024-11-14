@@ -8,7 +8,7 @@ import datetime
 import calendar
 from calendar import monthrange
 from calendar import monthrange
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
 
 def is_admin(user):
@@ -21,14 +21,24 @@ def home(request):
     return render(request, "home.html")
 
 
+def project_modal(request, project_id):
+    project = Project.objects.get(id=project_id)
+    context = {
+        'project': project,
+        'description': project.description,
+    }
+    return render(request, 'project_modal.html', context)
+
+
 @login_required
 def main(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
 
-    # input for creating a project
-    form = ProjectForm(request.POST or None)
     if request.method == 'POST':
         form = ProjectForm(request.POST)
+        if not form.is_valid():
+            print("Form errors:", form.errors)
+
         if form.is_valid():
             project = form.save(commit=False)
             project.created_by = request.user
@@ -38,10 +48,15 @@ def main(request):
             return redirect('users:main')
     else:
         form = ProjectForm()
-
     user_projects = profile.user.created_projects.all()
     other_projects = Project.objects.exclude(members=profile.user)
-    return render(request, "main.html", {'user': request.user, 'profile': profile, 'form': form, 'otherProjects': other_projects, 'userProjects': user_projects})
+    return render(request, "main.html", {
+        'user': request.user,
+        'profile': profile,
+        'form': form,
+        'otherProjects': other_projects,
+        'userProjects': user_projects
+    })
 
 
 @login_required
@@ -61,6 +76,16 @@ def update_profile(request):
     else:
         form = ProfileUpdateForm(instance=profile)
     return render(request, 'update_profile.html', {'form': form, 'first_name': request.user.first_name})
+
+
+@login_required
+def delete_project(request, project_id):
+    if request.method == 'POST':
+        project = get_object_or_404(Project, id=project_id)
+        if request.user == project.created_by:
+            project.delete()
+            return redirect('users:main')
+    return redirect('users:main')
 
 
 def calendar_view(request):
@@ -100,11 +125,11 @@ def projectView(request, id):
 @login_required
 def filesView(request, id):
     project = get_object_or_404(Project, id=id)
-    
+
     # Add authorization check
     if not request.user.is_authenticated or request.user not in project.members.all():
         return HttpResponse(status=403)
-        
+
     form = FileForm(request.POST or None, request.FILES or None)
 
     if request.method == 'POST' and form.is_valid():
@@ -112,7 +137,8 @@ def filesView(request, id):
         newFile.project = project
         newFile.file_name = request.FILES['file'].name
         newFile.file_size = request.FILES['file'].size
-        newFile.file_type = os.path.splitext(request.FILES['file'].name)[1][1:]  # Get extension without dot
+        newFile.file_type = os.path.splitext(request.FILES['file'].name)[
+            1][1:]  # Get extension without dot
         newFile.title = form.cleaned_data.get('title')
         newFile.description = form.cleaned_data.get('description')
         newFile.keywords = form.cleaned_data.get('keywords')

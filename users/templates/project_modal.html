@@ -1,0 +1,25 @@
+{% load static %}
+<div class="modal-header">
+    <h5 class="modal-title">{{project.name}}</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <p>{{description}}</p>
+    <div class="d-flex gap-2 mb-4">
+        <a class="btn btn-primary" href="{% url 'users:project-files' project.id %}">View Files</a>
+        <a class="btn btn-primary" href="{% url 'users:view-members' project.id %}">Members</a>
+        <button class="btn btn-primary" onclick="redirectToBooking()">Reserve Space</button>
+    </div>
+    
+    {% if user == project.created_by %}
+    <div class="mt-4 border-top pt-4">
+        <form action="{% url 'users:delete-project' project.id %}" method="POST" 
+              onsubmit="return confirm('Are you sure you want to delete {{ project.name|escapejs }}? This action cannot be undone.');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash me-2"></i>Delete Project
+            </button>
+        </form>
+    </div>
+    {% endif %}
+</div>

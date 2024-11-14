@@ -12,7 +12,12 @@ urlpatterns = [
     path('<int:id>/files/', views.filesView, name="project-files"),
     path('event/<int:event_id>/rsvp/', views.rsvp_event, name='rsvp_event'),
     path('event/create', views.create_event, name='create_event'),
-    path('event/<int:event_id>/delete/', views.delete_event, name='delete_event'),
+    path('event/<int:event_id>/delete/',
+         views.delete_event, name='delete_event'),
     path('<int:id>/members/', views.membersView, name="view-members"),
+    path('projects/<int:project_id>/modal-content/',
+         views.project_modal, name='project-modal'),
+    path('projects/<int:project_id>/delete/',
+         views.delete_project, name='delete-project'),
 
 ]

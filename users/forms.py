@@ -1,15 +1,27 @@
 from django import forms
 from .models import Profile, Project, File, Event, RSVP
 
+
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
-        model = Profile 
-        fields = ['bio','profile_picture']
+        model = Profile
+        fields = ['bio', 'profile_picture']
+
 
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['name'] 
+        fields = ['name', 'description']
+
+    name = forms.CharField(
+        max_length=100,
+        required=True,
+    )
+    description = forms.CharField(
+        widget=forms.Textarea,
+        required=True,
+    )
+
 
 class FileForm(forms.ModelForm):
     class Meta:
@@ -22,6 +34,7 @@ class FileForm(forms.ModelForm):
         self.fields['description'].required = False
         self.fields['keywords'].required = False
 
+
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
@@ -30,6 +43,7 @@ class EventForm(forms.ModelForm):
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
         }
+
 
 class RSVPForm(forms.ModelForm):
     class Meta:
