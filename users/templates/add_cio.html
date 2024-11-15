@@ -1,0 +1,14 @@
+<!-- add_cio.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Add Student Organization</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Add Organization</button>
+    </form>
+</div>
+{% endblock %}

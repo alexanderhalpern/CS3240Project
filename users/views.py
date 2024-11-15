@@ -2,13 +2,11 @@ import os
 from django.shortcuts import render, redirect,  get_object_or_404, reverse
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Profile, Project, Event, RSVP
-from .forms import ProfileUpdateForm, ProjectForm, FileForm, EventForm
+from .models import CIO, Profile, Project, Event, RSVP
+from .forms import ProfileUpdateForm, ProjectForm, FileForm, EventForm, CIOForm
 import datetime
 import calendar
-from calendar import monthrange
-from calendar import monthrange
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.contrib import messages
 from django.contrib.auth.models import User
 
@@ -17,10 +15,77 @@ def is_admin(user):
     return user.is_authenticated and hasattr(user, 'profile') and user.profile.is_pma_admin
 
 
+# def home(request):
+#     if request.user.is_authenticated:
+#         return redirect('users:main')
+#     return render(request, "home.html")
+
+
 def home(request):
     if request.user.is_authenticated:
-        return redirect('users:main')
-    return render(request, "home.html")
+        cios = CIO.objects.all().order_by('name')
+        print(cios)
+        slugs = [cio.slug for cio in cios]
+        print(slugs)
+        return render(request, 'home.html', {'cios': cios})
+    return render(request, 'cio_dashboard.html')
+
+
+@login_required
+def cio_detail(request, slug):
+    cio = get_object_or_404(CIO, slug=slug)
+    user_projects = cio.projects.filter(members=request.user)
+    other_projects = cio.projects.exclude(members=request.user)
+    upcoming_events = cio.events.filter(
+        date__gte=datetime.date.today()).order_by('date')[:5]
+
+    is_admin = request.user in cio.admins.all()
+    is_member = request.user in cio.members.all()
+
+    context = {
+        'cio': cio,
+        'user_projects': user_projects,
+        'other_projects': other_projects,
+        'upcoming_events': upcoming_events,
+        'is_admin': is_admin,
+        'is_member': is_member,
+        'admins': cio.admins.all(),
+        'members': cio.members.all(),
+    }
+    return render(request, 'cio_detail.html', context)
+
+
+@login_required
+def join_cio(request, slug):
+    if request.method == 'POST':
+        cio = get_object_or_404(CIO, slug=slug)
+        if request.user not in cio.members.all():
+            cio.members.add(request.user)
+            messages.success(
+                request, f'You have successfully joined {cio.name}!')
+        return redirect('users:cio-detail', slug=slug)
+    return redirect('users:home')
+
+
+@login_required
+def add_cio(request):
+    if request.method == 'POST':
+        form = CIOForm(request.POST, request.FILES)
+        if form.is_valid():
+            cio = form.save(commit=False)
+            cio.save()
+
+            # Add the current user as an admin and member
+            cio.admins.add(request.user)
+            cio.members.add(request.user)
+
+            messages.success(
+                request, 'The student organization has been added successfully!')
+            # Redirect with the slug of the newly created CIO
+            return redirect('users:cio-dashboard', slug=cio.slug)
+    else:
+        form = CIOForm()
+    return render(request, 'add_cio.html', {'form': form})
 
 
 def project_modal(request, project_id):
@@ -33,32 +98,43 @@ def project_modal(request, project_id):
 
 
 @login_required
-def main(request):
+def cio_dashboard(request, slug):
+    cio = get_object_or_404(CIO, slug=slug)
     profile, created = Profile.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
         form = ProjectForm(request.POST)
-        if not form.is_valid():
-            print("Form errors:", form.errors)
-
         if form.is_valid():
             project = form.save(commit=False)
             project.created_by = request.user
+            project.cio = cio  # Set the CIO for the project
             project.save()
             project.members.add(request.user)
             project.save()
-            return redirect('users:main')
+            return redirect('users:cio-dashboard', slug=slug)
     else:
         form = ProjectForm()
-    user_projects = profile.user.created_projects.all()
-    other_projects = Project.objects.exclude(members=profile.user)
-    return render(request, "main.html", {
+
+    user_projects = Project.objects.filter(
+        cio=cio,
+        members=request.user
+    )
+    other_projects = Project.objects.filter(
+        cio=cio
+    ).exclude(members=request.user)
+
+    is_admin = request.user in cio.admins.all()
+
+    context = {
         'user': request.user,
         'profile': profile,
         'form': form,
         'otherProjects': other_projects,
-        'userProjects': user_projects
-    })
+        'userProjects': user_projects,
+        'cio': cio,
+        'is_cio_admin': is_admin,
+    }
+    return render(request, "cio_dashboard.html", context)
 
 
 @login_required
@@ -74,7 +150,7 @@ def update_profile(request):
                 request.user.first_name = first_name
                 request.user.save()
             profile.save()
-            return redirect('users:main')
+            return redirect('users:home')
     else:
         form = ProfileUpdateForm(instance=profile)
     return render(request, 'update_profile.html', {'form': form, 'first_name': request.user.first_name})
@@ -86,35 +162,38 @@ def delete_project(request, project_id):
         project = get_object_or_404(Project, id=project_id)
         if request.user == project.created_by:
             project.delete()
-            return redirect('users:main')
-    return redirect('users:main')
+            return redirect('users:cio-dashboard', slug=project.cio.slug)
+    return redirect('users:cio-dashboard', slug=project.cio.slug)
 
 
-def calendar_view(request):
+def calendar_view(request, slug):
+    cio = get_object_or_404(CIO, slug=slug)
     today = datetime.date.today()
-    month = today.month
-    year = today.year
-    start_day, num_days = monthrange(year, month)
-    blank_days = [None] * start_day
-
-    # Get all events for the current month
-    events = Event.objects.filter(date__year=year, date__month=month)
-    user_rsvps = RSVP.objects.filter(user=request.user).values_list(
+    user_rsvps = RSVP.objects.filter(user=request.user, event__cio=cio).values_list(
         'event_id', flat=True) if request.user.is_authenticated else []
 
-    # Initialize calendar data for each day of the month
-    calendar_data = []
-    for day in range(1, num_days + 1):
-        day_date = datetime.date(year, month, day)
-        day_events = events.filter(date=day_date)
-        calendar_data.append({'day': day, 'events': day_events})
+    # If the request is for JSON data (used by FullCalendar)
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        events = Event.objects.filter(
+            date__year=today.year, date__month=today.month, cio=cio)
+        event_list = [
+            {
+                'id': event.id,
+                'title': event.name,
+                'start': event.date.isoformat(),
+                'description': event.description,
+                'time': event.time.isoformat(),
+                'rsvp': event.id in user_rsvps,
+            }
+            for event in events
+        ]
+        return JsonResponse(event_list, safe=False)
 
+    # If the request is not for JSON data, render the full template
     context = {
         'today': today,
-        'year': year,
-        'calendar_data': calendar_data,
-        'blank_days': blank_days,
-        'user_rsvps': user_rsvps,
+        'year': today.year,
+        'cio': cio,
     }
     return render(request, 'calendar.html', context)
 
@@ -156,7 +235,8 @@ def filesView(request, id):
     context = {
         'project': project,
         'files': files,
-        'form': form
+        'form': form,
+        'cio': project.cio,
     }
     return render(request, 'files.html', context)
 
@@ -169,40 +249,48 @@ def membersView(request, id):
     return render(request, 'members.html', {
         'project': project,
         'members': members,  # Pass the users directly
+        'cio': project.cio,
         'is_owner': is_owner
     })
 
 
 @login_required
 def rsvp_event(request, event_id):
-    if request.user.profile.is_pma_admin:
-        return redirect('users:calendar')  # or show a message
     event = get_object_or_404(Event, id=event_id)
+    if request.user.profile.is_pma_admin:
+        return redirect('users:cio-calendar', slug=event.cio.slug)
     rsvp, created = RSVP.objects.get_or_create(event=event, user=request.user)
     if not created:
         rsvp.delete()
-    return redirect('users:calendar')
+    return redirect('users:cio-calendar', slug=event.cio.slug)
 
 
-@user_passes_test(is_admin)
-def create_event(request):
+@login_required
+def create_event(request, slug):
+    cio = get_object_or_404(CIO, slug=slug)
+
+    if request.user not in cio.admins.all():
+        return HttpResponseForbidden("You do not have permission to create an event for this CIO.")
+
     if request.method == 'POST':
         form = EventForm(request.POST)
         if form.is_valid():
             event = form.save(commit=False)
             event.created_by = request.user
+            event.cio = cio
             event.save()
-            return redirect('users:calendar')
+            return redirect('users:cio-calendar', slug=cio.slug)
     else:
         form = EventForm()
-    return render(request, 'create_event.html', {'form': form})
+
+    return render(request, 'create_event.html', {'form': form, 'cio': cio})
 
 
 @user_passes_test(is_admin)
 def delete_event(request, event_id):
     event = get_object_or_404(Event, id=event_id, created_by=request.user)
     event.delete()
-    return redirect('users:calendar')
+    return redirect('users:cio-calendar', slug=event.cio.slug)
 
 
 def logout_view(request):

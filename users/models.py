@@ -1,6 +1,37 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse
+from django.utils.text import slugify
+from django.db.models.signals import pre_save
+
 import os
+
+
+class CIO(models.Model):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True, blank=True)
+    description = models.TextField()
+    image = models.ImageField(upload_to='cios/')
+    admins = models.ManyToManyField(
+        User, related_name='admin_cios', blank=True)
+    members = models.ManyToManyField(
+        User, related_name='member_cios', blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('users:cio-dashboard', kwargs={'slug': self.slug})
+
+
+def generate_slug(sender, instance, **kwargs):
+    if not instance.slug:
+        instance.slug = slugify(instance.name)
+
+
+pre_save.connect(generate_slug, sender=CIO)
 
 
 class Profile(models.Model):
@@ -21,10 +52,11 @@ class Project(models.Model):
     created_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='created_projects')
     members = models.ManyToManyField(User, related_name='joined_projects')
+    cio = models.ForeignKey(CIO, on_delete=models.CASCADE,
+                            related_name='projects')  # New field
 
     def __str__(self):
         return self.name
-
 
 # class File(models.Model):
 #    project = models.ForeignKey(
@@ -34,6 +66,7 @@ class Project(models.Model):
 #
 #    def __str__(self):
 #        return self.file.name
+
 
 class File(models.Model):
     project = models.ForeignKey(
@@ -66,6 +99,8 @@ class Event(models.Model):
     time = models.TimeField()
     created_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='events_created')
+    cio = models.ForeignKey(CIO, on_delete=models.CASCADE,
+                            related_name='events')  # New field
 
     def __str__(self):
         return f"{self.name} on {self.date}"
