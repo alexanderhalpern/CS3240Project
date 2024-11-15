@@ -21,10 +21,14 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#createProjectModal">Create Project</a>
+                        <a class="nav-link" href="{% url 'users:home' %}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'users:calendar' %}">Calendar</a>
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#createProjectModal">Create Project</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'users:cio-calendar' slug=cio.slug %}">View Calendar</a>
                     </li> 
                 </ul>
                 <ul class="navbar-nav">

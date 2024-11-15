@@ -1,5 +1,5 @@
 from django import forms
-from .models import Profile, Project, File, Event, RSVP
+from .models import Profile, Project, File, Event, RSVP, CIO
 
 
 class ProfileUpdateForm(forms.ModelForm):
@@ -21,6 +21,12 @@ class ProjectForm(forms.ModelForm):
         widget=forms.Textarea,
         required=True,
     )
+
+
+class CIOForm(forms.ModelForm):
+    class Meta:
+        model = CIO
+        fields = ['name', 'description', 'image']
 
 
 class FileForm(forms.ModelForm):

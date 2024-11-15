@@ -4,7 +4,8 @@
 {% block content %}
 <div class="container py-5">
     <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold mb-3">Welcome, {{ user.first_name|default:user.email }}!</h1>
+        <h1 class="display-4 fw-bold mb-3">{{ cio.name }}</h1>
+        <h3>Welcome, {{ user.first_name|default:user.email }}!</h3>
         {% if profile.is_pma_admin %}
             <div class="alert alert-primary d-inline-flex align-items-center px-4 py-3" role="alert">
                 <i class="bi bi-shield-check fs-4 me-2"></i>
@@ -165,7 +166,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <form method="POST" action="{% url 'users:main' %}" class="needs-validation" novalidate>
+                    <form method="POST" action="{% url 'users:cio-dashboard' slug=cio.slug %}" class="needs-validation" novalidate>
                         {% csrf_token %}
                         <!-- Project Title Field -->
                         <div class="mb-4">

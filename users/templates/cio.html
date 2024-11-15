@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3">Welcome, {{ user.first_name|default:user.email }}!</h1>
+        {% if profile.is_pma_admin %}
+            <div class="alert alert-primary d-inline-flex align-items-center px-4 py-3" role="alert">
+                <i class="bi bi-shield-check fs-4 me-2"></i>
+                <div>
+                    <strong>Admin Access</strong>
+                    <p class="mb-0">You have administrator privileges to manage your club</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card border-0 bg-primary bg-opacity-10 h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-folder-fill display-4 text-primary mb-3"></i>
+                    <h3 class="fw-bold">{{ userProjects|length }}</h3>
+                    <p class="text-muted mb-0">My Projects</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 bg-success bg-opacity-10 h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-people-fill display-4 text-success mb-3"></i>
+                    <h3 class="fw-bold">{{ otherProjects|length }}</h3>
+                    <p class="text-muted mb-0">Other Projects</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 bg-info bg-opacity-10 h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-graph-up display-4 text-info mb-3"></i>
+                    <h3 class="fw-bold">{{ userProjects|length|add:otherProjects|length }}</h3>
+                    <p class="text-muted mb-0">Total Projects</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold m-0">
+                <i class="bi bi-folder2-open me-2"></i>My Projects
+            </h2>
+            {% if user.profile.is_pma_admin %}
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProjectModal">
+                <i class="bi bi-plus-lg me-2"></i>Create Project
+            </button>
+            {% endif %}
+        </div>
+
+        {% if userProjects %}
+            <div class="row g-4">
+                {% for p in userProjects %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="bg-primary p-2 bg-opacity-10 rounded-3 me-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-folder-fill" viewBox="0 0 16 16">
+                                            <path d="M9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.825a2 2 0 0 1-1.991-1.819l-.637-7a2 2 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3m-8.322.12q.322-.119.684-.12h5.396l-.707-.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981z"/>
+                                          </svg>
+                                    </div>
+                                    <h5 class="card-title fw-bold mb-0">{{ p.name }}</h5>
+                                </div>
+                                {% if user.profile.is_pma_admin %}
+                                    <span class="badge bg-primary mb-3">Owner</span>
+                                {% endif %}
+                                <p class="card-title mb-0">{{ p.description }}</p>
+
+                                <div class="mt-3">
+                                    <button class="btn btn-primary w-100 view-project-btn" 
+                                            data-project-id="{{ p.id }}">
+                                        <i class="bi bi-eye me-2"></i>View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card border-0 bg-light">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-folder-x display-3 text-muted mb-3"></i>
+                    <h4 class="text-muted">No Projects Yet</h4>
+                    {% if user.profile.is_pma_admin %}
+                        <p class="mb-4">Start by creating your first project!</p>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProjectModal">
+                            <i class="bi bi-plus-lg me-2"></i>Create Project
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold m-0">
+                <i class="bi bi-collection me-2"></i>All Projects
+            </h2>
+        </div>
+
+        {% if otherProjects %}
+            <div class="row g-4">
+                {% for p in otherProjects %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="bg-primary p-2 bg-opacity-10 rounded-3 me-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-folder-fill" viewBox="0 0 16 16">
+                                            <path d="M9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.825a2 2 0 0 1-1.991-1.819l-.637-7a2 2 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3m-8.322.12q.322-.119.684-.12h5.396l-.707-.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981z"/>
+                                          </svg>
+                                    </div>
+                                    <h5 class="card-title fw-bold mb-0">{{ p.name }}</h5>
+                                </div>
+                                <span class="badge bg-secondary mb-3">Member</span>
+                                <div class="mt-3">
+                                    <button class="btn btn-outline-primary w-100 view-project-btn" 
+                                            data-project-id="{{ p.id }}">
+                                        <i class="bi bi-eye me-2"></i>View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card border-0 bg-light">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-collection display-3 text-muted mb-3"></i>
+                    <h4 class="text-muted">No Other Projects Available</h4>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+    <div class="modal fade" id="createProjectModal" tabindex="-1" aria-labelledby="createProjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold" id="createProjectModalLabel">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        {% if user.profile.is_pma_admin %}
+                            Create New Project
+                        {% else %}
+                            View Projects
+                        {% endif %}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form method="POST" action="{% url 'users:cio-dashboard' slug=cio.slug %}" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <!-- Project Title Field -->
+                        <div class="mb-4">
+                            <label for="projectTitle" class="form-label fw-semibold">
+                                <i class="bi bi-type me-1"></i>Project Title
+                            </label>
+                            <input type="text" 
+                                class="form-control form-control-lg" 
+                                id="projectTitle" 
+                                name="name"
+                                required
+                                placeholder="Enter project title">
+                            <div class="invalid-feedback">
+                                Please provide a project title.
+                            </div>
+                        </div>
+
+                        <!-- Project Description Field -->
+                        <div class="mb-4 position-relative">
+                            <label for="projectDescription" class="form-label fw-semibold">
+                                <i class="bi bi-text-paragraph me-1"></i>Project Description
+                            </label>
+                            <textarea class="form-control" 
+                                    id="projectDescription" 
+                                    name="description" 
+                                    rows="4"
+                                    required
+                                    placeholder="Describe your project (minimum 10 characters)"></textarea>
+                            <div class="invalid-feedback" id="descriptionError">
+                                Please provide a project description of at least 10 characters.
+                            </div>
+                            <small class="text-muted position-absolute end-0 bottom-0 mb-1 me-2" id="charCount">
+                                0 characters
+                            </small>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle me-2"></i>Create Project
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="projectDetailModal" tabindex="-1" aria-labelledby="projectDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0">
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function setupProjectLinks() {
+            const projectLinks = document.querySelectorAll('.view-project-btn');
+            projectLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const projectId = this.getAttribute('data-project-id');
+                    fetch(`/projects/${projectId}/modal-content/`)
+                        .then(response => response.text())
+                        .then(html => {
+                            document.querySelector('#projectDetailModal .modal-content').innerHTML = html;
+                            new bootstrap.Modal(document.getElementById('projectDetailModal')).show();
+                        });
+                });
+            });
+        }
+        setupProjectLinks();
+    });
+    
+(function () {
+    'use strict'
+
+    // Fetch all forms with the 'needs-validation' class
+    const forms = document.querySelectorAll('.needs-validation')
+
+    // Add validation on form submission
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+
+            // Additional custom validation for description length
+            const description = form.querySelector('#projectDescription')
+            if (description.value.trim().length < 10) {
+                event.preventDefault()
+                event.stopPropagation()
+                description.setCustomValidity('Description must be at least 10 characters long')
+                
+                // Create or update custom error message
+                let errorDiv = form.querySelector('#descriptionError')
+                if (!errorDiv) {
+                    errorDiv = document.createElement('div')
+                    errorDiv.id = 'descriptionError'
+                    errorDiv.className = 'invalid-feedback'
+                    description.parentNode.appendChild(errorDiv)
+                }
+                errorDiv.textContent = 'Description must be at least 10 characters long'
+            } else {
+                description.setCustomValidity('')
+            }
+
+            form.classList.add('was-validated')
+        }, false)
+
+        // Real-time validation for description field
+        const description = form.querySelector('#projectDescription')
+        description.addEventListener('input', () => {
+            if (description.value.trim().length < 10) {
+                description.setCustomValidity('Description must be at least 10 characters long')
+            } else {
+                description.setCustomValidity('')
+            }
+        })
+    })
+})()
+</script>
+{% endblock %}
