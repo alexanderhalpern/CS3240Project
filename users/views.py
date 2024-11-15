@@ -53,7 +53,7 @@ def cio_detail(request, slug):
         'admins': cio.admins.all(),
         'members': cio.members.all(),
     }
-    return render(request, 'cio_detail.html', context)
+    return render(request, 'cio/detail.html', context)
 
 
 @login_required
@@ -96,7 +96,7 @@ def add_cio(request):
             return redirect('users:cio-dashboard', slug=cio.slug)
     else:
         form = CIOForm()
-    return render(request, 'add_cio.html', {'form': form})
+    return render(request, 'cio/add.html', {'form': form})
 
 
 @login_required
@@ -146,7 +146,7 @@ def cio_members(request, slug):
         "members": members,
         "is_admin": is_admin,
     }
-    return render(request, "cio_members.html", context)
+    return render(request, "cio/members.html", context)
 
 
 def project_modal(request, project_id):
@@ -155,7 +155,7 @@ def project_modal(request, project_id):
         'project': project,
         'description': project.description,
     }
-    return render(request, 'project_modal.html', context)
+    return render(request, 'project/modal.html', context)
 
 
 @login_required
@@ -195,7 +195,7 @@ def cio_dashboard(request, slug):
         'cio': cio,
         'is_cio_admin': is_admin,
     }
-    return render(request, "cio_dashboard.html", context)
+    return render(request, "cio/dashboard.html", context)
 
 
 @login_required
@@ -263,12 +263,12 @@ def calendar_view(request, slug):
         'cio': cio,
         'upcoming_events': upcoming_events,  # Include upcoming events
     }
-    return render(request, 'calendar.html', context)
+    return render(request, 'cio/calendar.html', context)
 
 
 def projectView(request, id):
     project = get_object_or_404(Project, id=id)
-    return render(request, 'project.html', {'description': project.description, 'project': project})
+    return render(request, 'project/view.html', {'description': project.description, 'project': project})
 
 
 @login_required
@@ -306,17 +306,18 @@ def filesView(request, id):
         'form': form,
         'cio': project.cio,
     }
-    return render(request, 'files.html', context)
+    return render(request, 'project/files.html', context)
 
 
+@login_required
 def membersView(request, id):
     project = get_object_or_404(Project, id=id)
     members = project.members.all()
     is_owner = project.created_by == request.user
 
-    return render(request, 'members.html', {
+    return render(request, 'project/members.html', {
         'project': project,
-        'members': members,  # Pass the users directly
+        'members': members,
         'cio': project.cio,
         'is_owner': is_owner
     })
@@ -351,7 +352,7 @@ def create_event(request, slug):
     else:
         form = EventForm()
 
-    return render(request, 'create_event.html', {'form': form, 'cio': cio})
+    return render(request, 'event/create.html', {'form': form, 'cio': cio})
 
 
 @user_passes_test(is_admin)
