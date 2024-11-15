@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Members - {{ cio.name }} - ClubHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <a href="{% url 'users:cio-dashboard' slug=cio.slug %}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+        <h1 class="mb-0">Members of {{ cio.name }}</h1>
+        {% if is_admin %}
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+                <i class="bi bi-person-plus me-2"></i>Add Member
+            </button>
+            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+                <i class="bi bi-person-check me-2"></i>Add Admin
+            </button>
+        {% endif %}
+    </div>
+
+    <div class="mb-5">
+        <h2 class="fw-bold">Admins</h2>
+        <div class="row">
+            {% for admin in admins %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body d-flex align-items-center">
+                            {% if admin.profile and admin.profile.profile_picture %}
+                                <img src="{{ admin.profile.profile_picture.url }}" class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover;" alt="Profile Picture">
+                            {% else %}
+                                <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-person text-primary"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h5 class="mb-0">{{ admin.first_name|default:admin.email }}</h5>
+                                <p class="text-muted mb-0">{{ admin.email }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="mb-5">
+        <h2 class="fw-bold">Members</h2>
+        <div class="row">
+            {% for member in members %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body d-flex align-items-center">
+                            {% if member.profile and member.profile.profile_picture %}
+                                <img src="{{ member.profile.profile_picture.url }}" class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover;" alt="Profile Picture">
+                            {% else %}
+                                <div class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-person text-success"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h5 class="mb-0">{{ member.first_name|default:member.email }}</h5>
+                                <p class="text-muted mb-0">{{ member.email }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block modals %}
+{% if is_admin %}
+<div class="modal fade" id="addMemberModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Member to {{ cio.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'users:add-cio-member' slug=cio.slug %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="member_email" class="form-label">User Email</label>
+                        <input type="email" class="form-control" id="member_email" name="email" required>
+                        <div class="form-text">Enter the email address of the user you want to add</div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Add Member</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addAdminModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Admin to {{ cio.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'users:add-cio-admin' slug=cio.slug %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="admin_email" class="form-label">User Email</label>
+                        <input type="email" class="form-control" id="admin_email" name="email" required>
+                        <div class="form-text">Enter the email address of the user you want to add</div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Add Admin</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

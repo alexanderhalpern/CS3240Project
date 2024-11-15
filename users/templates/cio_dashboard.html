@@ -17,6 +17,31 @@
         {% endif %}
     </div>
 
+    {% if user.is_authenticated %}
+        {% if user not in cio.members.all %}
+            <form class="w-100" method="POST" action="{% url 'users:join-cio' slug=cio.slug %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success w-100 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person mr-2" viewBox="0 0 16 16">
+                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+                      </svg> Join CIO
+                </button>
+            </form>
+        {% else %}
+        <form class="w-100" method="POST" action="{% url 'users:leave-cio' slug=cio.slug %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger w-100 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person mr-2" viewBox="0 0 16 16">
+                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+                  </svg> Leave CIO
+            </button>
+        </form>
+        {% endif %}
+    {% else %}
+        <p class="text-muted">Log in to join this organization.</p>
+    {% endif %}
+
+
     <div class="row g-4 mb-5">
         <div class="col-md-4">
             <div class="card border-0 bg-primary bg-opacity-10 h-100">
@@ -168,7 +193,6 @@
                 <div class="modal-body p-4">
                     <form method="POST" action="{% url 'users:cio-dashboard' slug=cio.slug %}" class="needs-validation" novalidate>
                         {% csrf_token %}
-                        <!-- Project Title Field -->
                         <div class="mb-4">
                             <label for="projectTitle" class="form-label fw-semibold">
                                 <i class="bi bi-type me-1"></i>Project Title

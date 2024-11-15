@@ -26,7 +26,13 @@ urlpatterns = [
          views.join_project, name='join-project'),
     path('cio/<slug:slug>/', views.cio_detail, name='cio-detail'),
     path('cio/<slug:slug>/join/', views.join_cio, name='join-cio'),
+    path('cio/<slug:slug>/leave/', views.leave_cio, name='leave-cio'),
     path('cio/<slug:slug>/dashboard/', views.cio_dashboard, name="cio-dashboard"),
+    path('cio/<slug:slug>/members/add/',
+         views.add_cio_member, name='add-cio-member'),
+    path('cio/<slug:slug>/admins/add/',
+         views.add_cio_admin, name='add-cio-admin'),
+    path('cio/<slug:slug>/members/', views.cio_members, name='cio-members'),
 
     path('add-cio/', views.add_cio, name='add-cio'),
 
