@@ -29,7 +29,7 @@ def home(request):
         print(slugs)
         return render(request, 'home.html', {'cios': cios})
 
-    return render(request, 'login.html')
+    return render(request, 'user/login.html')
 
 
 @login_required
@@ -214,7 +214,7 @@ def update_profile(request):
             return redirect('users:home')
     else:
         form = ProfileUpdateForm(instance=profile)
-    return render(request, 'update_profile.html', {'form': form, 'first_name': request.user.first_name})
+    return render(request, 'user/update.html', {'form': form, 'first_name': request.user.first_name})
 
 
 @login_required
