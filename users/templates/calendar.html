@@ -36,19 +36,35 @@
         <div class="mb-3">
             <a href="{% url 'users:cio-dashboard' slug=cio.slug %}" class="btn btn-outline-secondary">Back to Dashboard</a>
         </div>
-        <h2 class="text-center mb-4">{{ cio.name }} Calendar </h2>
-        
-        {% if request.user.is_authenticated and request.user in cio.admins.all %}
-            <a href="{% url 'users:create_event' slug=cio.slug %}" class="btn btn-primary mb-4">Create Event</a>
+        <div class="d-flex align-items-center justify-content-between">
+            <h2 class="text-center mb-4">{{ cio.name }} Calendar</h2> 
+            {% if request.user.is_authenticated and request.user in cio.admins.all %}
+                <a href="{% url 'users:create_event' slug=cio.slug %}" class="btn btn-primary mb-4">Create Event</a>
+            {% endif %}
+        </div>
+    
+        {% if upcoming_events %}
+            <h4 class="mb-3">Upcoming Events</h4>
+            <ul class="list-group mb-4">
+                {% for event in upcoming_events %}
+                    <li class="list-group-item">
+                        <h5 class="mb-1">{{ event.name }}</h5>
+                        <small class="text-muted">
+                            {{ event.date|date:"F j, Y" }} at {{ event.time|date:"g:i A" }}
+                        </small>
+                        <p class="mb-0">{{ event.description }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">No upcoming events.</p>
         {% endif %}
 
+        
 
-
-        <!-- FullCalendar container -->
         <div id="calendar"></div>
     </div>
 
-    <!-- FullCalendar JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     {% bootstrap_javascript %}
 
@@ -97,7 +113,6 @@
         }
     </script>
 
-    <!-- Event Details Modal -->
     <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

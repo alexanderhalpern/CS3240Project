@@ -28,7 +28,8 @@ def home(request):
         slugs = [cio.slug for cio in cios]
         print(slugs)
         return render(request, 'home.html', {'cios': cios})
-    return render(request, 'cio_dashboard.html')
+
+    return render(request, 'login.html')
 
 
 @login_required
@@ -63,8 +64,20 @@ def join_cio(request, slug):
             cio.members.add(request.user)
             messages.success(
                 request, f'You have successfully joined {cio.name}!')
-        return redirect('users:cio-detail', slug=slug)
-    return redirect('users:home')
+        return redirect('users:cio-dashboard', slug=slug)
+    return redirect('users:cio-dashboard', slug=slug)
+
+
+@login_required
+def leave_cio(request, slug):
+    if request.method == 'POST':
+        cio = get_object_or_404(CIO, slug=slug)
+        if request.user in cio.members.all():
+            cio.members.remove(request.user)
+            messages.success(
+                request, f'You have left {cio.name}.')
+        return redirect('users:cio-dashboard', slug=slug)
+    return redirect('users:cio-dashboard', slug=slug)
 
 
 @login_required
@@ -75,17 +88,65 @@ def add_cio(request):
             cio = form.save(commit=False)
             cio.save()
 
-            # Add the current user as an admin and member
             cio.admins.add(request.user)
             cio.members.add(request.user)
 
             messages.success(
                 request, 'The student organization has been added successfully!')
-            # Redirect with the slug of the newly created CIO
             return redirect('users:cio-dashboard', slug=cio.slug)
     else:
         form = CIOForm()
     return render(request, 'add_cio.html', {'form': form})
+
+
+@login_required
+def add_cio_member(request, slug):
+    cio = get_object_or_404(CIO, slug=slug)
+    if request.user not in cio.admins.all():
+        return HttpResponseForbidden("You are not allowed to add members.")
+    if request.method == "POST":
+        email = request.POST.get("email")
+        user = get_object_or_404(User, email=email)
+        if user not in cio.members.all():
+            cio.members.add(user)
+            messages.success(request, f"{email} has been added as a member.")
+        else:
+            messages.warning(request, f"{email} is already a member.")
+        return redirect("users:cio-dashboard", slug=slug)
+
+
+@login_required
+def add_cio_admin(request, slug):
+    cio = get_object_or_404(CIO, slug=slug)
+    if request.user not in cio.admins.all():
+        return HttpResponseForbidden("You are not allowed to add admins.")
+    if request.method == "POST":
+        email = request.POST.get("email")
+        user = get_object_or_404(User, email=email)
+        if user not in cio.admins.all():
+            cio.admins.add(user)
+            cio.members.add(user)
+            messages.success(request, f"{email} has been added as an admin.")
+        else:
+            messages.warning(request, f"{email} is already an admin.")
+        return redirect("users:cio-dashboard", slug=slug)
+
+
+@login_required
+def cio_members(request, slug):
+    cio = get_object_or_404(CIO, slug=slug)
+    is_admin = request.user in cio.admins.all()
+
+    admins = cio.admins.all()
+    members = cio.members.all()
+
+    context = {
+        "cio": cio,
+        "admins": admins,
+        "members": members,
+        "is_admin": is_admin,
+    }
+    return render(request, "cio_members.html", context)
 
 
 def project_modal(request, project_id):
@@ -169,31 +230,38 @@ def delete_project(request, project_id):
 def calendar_view(request, slug):
     cio = get_object_or_404(CIO, slug=slug)
     today = datetime.date.today()
+    now = datetime.datetime.now().time()
+
     user_rsvps = RSVP.objects.filter(user=request.user, event__cio=cio).values_list(
         'event_id', flat=True) if request.user.is_authenticated else []
 
-    # If the request is for JSON data (used by FullCalendar)
+    upcoming_events = (
+        Event.objects.filter(cio=cio, date__gte=today)
+        .exclude(date=today, time__lt=now)  # Exclude past events for today
+        .order_by('date', 'time')[:5]
+    )
+
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         events = Event.objects.filter(
-            date__year=today.year, date__month=today.month, cio=cio)
+            date__year=today.year, date__month=today.month, cio=cio
+        )
         event_list = [
             {
                 'id': event.id,
                 'title': event.name,
-                'start': event.date.isoformat(),
+                'start': f"{event.date}T{event.time}",
                 'description': event.description,
-                'time': event.time.isoformat(),
                 'rsvp': event.id in user_rsvps,
             }
             for event in events
         ]
         return JsonResponse(event_list, safe=False)
 
-    # If the request is not for JSON data, render the full template
     context = {
         'today': today,
         'year': today.year,
         'cio': cio,
+        'upcoming_events': upcoming_events,  # Include upcoming events
     }
     return render(request, 'calendar.html', context)
 
