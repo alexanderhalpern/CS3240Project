@@ -28,7 +28,7 @@ def home(request):
         slugs = [cio.slug for cio in cios]
         print(slugs)
         return render(request, 'home.html', {'cios': cios})
-
+    return render(request, 'home.html')
     return render(request, 'user/login.html')
 
 
