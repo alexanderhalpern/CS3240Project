@@ -105,7 +105,7 @@
                                 <span class="text-muted">
                                     <i class="bi bi-people-fill me-2"></i>{{ cio.members.count }} members
                                 </span>
-                                <a href="{{ cio.get_absolute_url }}" class="btn btn-primary">
+                                <a href= "{% if user.is_authenticated %}{{ cio.get_absolute_url }}{% else %}{% provider_login_url 'google' %}{% endif %}" class="btn btn-primary">
                                     <i class="bi bi-arrow-right me-2"></i>View Details
                                 </a>
                             </div>
