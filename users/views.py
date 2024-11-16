@@ -22,14 +22,18 @@ def is_admin(user):
 
 
 def home(request):
-    if request.user.is_authenticated:
+    if request.user.is_authenticated or request.session.get('is_guest', False):
         cios = CIO.objects.all().order_by('name')
         print(cios)
         slugs = [cio.slug for cio in cios]
         print(slugs)
         return render(request, 'home.html', {'cios': cios})
-    return render(request, 'home.html')
+    #return render(request, 'home.html')
     return render(request, 'user/login.html')
+
+def continue_as_guest(request):
+    request.session['is_guest'] = True
+    return redirect('/')
 
 
 @login_required

@@ -35,5 +35,6 @@ urlpatterns = [
     path('cio/<slug:slug>/members/', views.cio_members, name='cio-members'),
 
     path('add-cio/', views.add_cio, name='add-cio'),
+    path('guest-view/', views.continue_as_guest, name="guest-view"),
 
 ]
