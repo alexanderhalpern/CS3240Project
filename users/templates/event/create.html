@@ -55,7 +55,7 @@
             {% bootstrap_form form %}
             <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary">Create Event</button>
-                <a href="{% url 'users:calendar' %}" class="btn btn-secondary">Cancel</a>
+                <a href="{% url 'users:cio-calendar' slug=cio.slug %}" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </div>
