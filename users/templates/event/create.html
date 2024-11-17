@@ -52,7 +52,7 @@
         <h2>Create a New Event</h2>
         <form method="post">
             {% csrf_token %}
-            {{ form|bootstrap }}
+            {% bootstrap_form form %}
             <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary">Create Event</button>
                 <a href="{% url 'users:calendar' %}" class="btn btn-secondary">Cancel</a>
