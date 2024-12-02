@@ -55,16 +55,16 @@
                                 </li>
                                 <li>
                                     <a class="dropdown-item" href="{% url 'users:mailbox' %}">
-                                        <i class="bi bi-envelope me-2"></i>Mailbox
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'users:mailbox' %}">
                                         <i class="bi bi-envelope me-2"></i>
                                         Mailbox
                                         {% if unread_count > 0 %}
                                             <span class="badge bg-danger">{{ unread_count }}</span>
                                         {% endif %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'account_logout' %}">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
                                     </a>
                                 </li>
                             {% else %}
