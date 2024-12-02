@@ -8,6 +8,18 @@
     {% load bootstrap5 %}
     {% bootstrap_css %}
     {% load socialaccount %}
+
+    <style>
+        /* make unread notifications have different coloring */
+        .unread {
+            background-color: #eda0a7;
+            font-weight: bold;
+        }
+
+        .unread:hover {
+            background-color: #f5c6cb;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
