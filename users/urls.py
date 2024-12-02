@@ -36,5 +36,6 @@ urlpatterns = [
 
     path('add-cio/', views.add_cio, name='add-cio'),
     path('guest-view/', views.continue_as_guest, name="guest-view"),
-    path('mailbox/', views.mailbox, name='mailbox')
+    path('mailbox/', views.mailbox, name='mailbox'),
+    path('notifications/<int:notification_id>/mark-as-read/', views.mark_as_read, name='mark_as_read')
 ]

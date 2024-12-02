@@ -165,6 +165,14 @@ def mailbox(request):
     #testing correct URL hopefully
     return render(request, 'user/mailbox.html', {'notifications': notifications})
 
+#mark as read feature hopefully
+@login_required
+def mark_as_read(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id, user=request.user)
+    notification.is_read = True
+    notification.save()
+    return redirect('users:mailbox')
+
 def project_modal(request, project_id):
     project = Project.objects.get(id=project_id)
     context = {
