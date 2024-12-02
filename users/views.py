@@ -9,6 +9,7 @@ import calendar
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.contrib import messages
 from django.contrib.auth.models import User
+from .models import Notification
 
 
 def is_admin(user):
@@ -151,6 +152,18 @@ def cio_members(request, slug):
         "is_admin": is_admin,
     }
     return render(request, "cio/members.html", context)
+
+#@login_required
+#def mailbox(request):
+#    notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+#    #note to self, need to fix URL
+#    return render(request, 'cio/mailbox.html', {'notifications': notifications})
+
+@login_required
+def mailbox(request):
+    notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+    #testing correct URL hopefully
+    return render(request, 'mailbox.html', {'notifications': notifications})
 
 
 def project_modal(request, project_id):

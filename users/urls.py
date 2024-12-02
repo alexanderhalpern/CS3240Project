@@ -36,5 +36,5 @@ urlpatterns = [
 
     path('add-cio/', views.add_cio, name='add-cio'),
     path('guest-view/', views.continue_as_guest, name="guest-view"),
-
+    path('mailbox/', views.mailbox, name='mailbox')
 ]
