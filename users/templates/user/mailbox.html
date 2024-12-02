@@ -8,6 +8,82 @@
     {% bootstrap_css %}
 </head>
 <body>
+    <!-- Navbar copied from home.html -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="{% static 'images/clubhub.png' %}" alt="ClubHub Logo" style="height: 30px;">
+            </a>
+    
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+    
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="rounded-circle overflow-hidden me-2" style="width: 30px; height: 30px;">
+                                {% if profile.profile_picture %}
+                                    <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="img-fluid">
+                                {% else %}
+                                    <img src="{% static 'images/default_profile_picture.jpg' %}" alt="Default Profile Picture" class="img-fluid">
+                                {% endif %}
+                            </div>
+                            <span class="d-none d-lg-inline">
+                                {% if user.is_authenticated %}
+                                    {{ user.first_name|default:user.email }}
+                                {% else %}
+                                    Guest
+                                {% endif %}
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="navbarDropdown">
+                            {%if user.is_authenticated %}
+                                <li>
+                                    <div class="px-3 py-2">
+                                        <p class="mb-0 fw-bold">{{ user.first_name|default:user.email }}</p>
+                                        <small class="text-muted">{{ user.email }}</small>
+                                    </div>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'users:update_profile' %}">
+                                        <i class="bi bi-person me-2"></i>Edit Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'users:mailbox' %}">
+                                        <i class="bi bi-envelope me-2"></i>Mailbox
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'account_logout' %}">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <div class="px-3 py-2">
+                                        <p class="mb-0 fw-bold">Guest</p>
+                                        <small class="text-muted">Welcome!</small>
+                                    </div>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{% provider_login_url 'google' %}">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mailbox content -->
     <div class="container mt-5">
         <div class="d-flex align-items-center justify-content-between">
             <h2 class="text-center mb-4">Mailbox</h2>
