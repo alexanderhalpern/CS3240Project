@@ -161,10 +161,16 @@ def cio_members(request, slug):
 
 @login_required
 def mailbox(request):
-    notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
-    unread_count = notifications.filter(is_read=False).count()
+    unread_notifications = Notification.objects.filter(user=request.user, is_read=False).order_by('-created_at')
+    read_notifications = Notification.objects.filter(user=request.user, is_read=True).order_by('-created_at')
+
+    unread_count = unread_notifications.count()
     #testing correct URL hopefully
-    return render(request, 'user/mailbox.html', {'notifications': notifications, 'unread_count': unread_count})
+    return render(request, 'user/mailbox.html', {
+        'unread_notifications': unread_notifications,
+        'read_notifications': read_notifications,
+        'unread_count': unread_count
+    })
 
 #mark as read feature hopefully
 @login_required
