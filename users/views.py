@@ -181,6 +181,13 @@ def mark_as_read(request, notification_id):
     notification.save()
     return redirect('users:mailbox')
 
+#mark all as read feature hopefully
+@login_required
+def mark_all_as_read(request):
+    unread_notifications = Notification.objects.filter(user=request.user, is_read=False)
+    unread_notifications.update(is_read=True)
+    return redirect('users:mailbox')
+
 def project_modal(request, project_id):
     project = Project.objects.get(id=project_id)
     context = {

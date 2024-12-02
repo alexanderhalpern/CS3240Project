@@ -119,6 +119,10 @@
         {% if unread_notifications %}
         <div class="mb-4">
             <h4>Unread Notifications</h4>
+            <form action="{% url 'users:mark_all_as_read' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-success mb-3">Mark All as Read</button>
+            </form>
             <ul class="list-group">
                 {% for notification in unread_notifications %}
                     <li class="list-group-item unread">
