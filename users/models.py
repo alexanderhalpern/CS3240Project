@@ -115,3 +115,15 @@ class RSVP(models.Model):
 
     def __str__(self):
         return f"{self.user.username} RSVP for {self.event.name}"
+
+class Notification(models.Model):
+    #model for notification
+    #notification will be assigned to a specific user, each notification will have a time of creation, content
+    #and a state of read or unread
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Notification for {self.user.username}: {self.content[:30]}"
