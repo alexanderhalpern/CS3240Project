@@ -162,8 +162,9 @@ def cio_members(request, slug):
 @login_required
 def mailbox(request):
     notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+    unread_count = notifications.filter(is_read=False).count()
     #testing correct URL hopefully
-    return render(request, 'user/mailbox.html', {'notifications': notifications})
+    return render(request, 'user/mailbox.html', {'notifications': notifications, 'unread_count': unread_count})
 
 #mark as read feature hopefully
 @login_required
