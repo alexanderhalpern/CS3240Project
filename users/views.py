@@ -163,8 +163,7 @@ def cio_members(request, slug):
 def mailbox(request):
     notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
     #testing correct URL hopefully
-    return render(request, 'mailbox.html', {'notifications': notifications})
-
+    return render(request, 'user/mailbox.html', {'notifications': notifications})
 
 def project_modal(request, project_id):
     project = Project.objects.get(id=project_id)
