@@ -105,7 +105,15 @@
 
     <div class="container mt-5">
         <div class="d-flex align-items-center justify-content-between">
-            <h2 class="text-center mb-4">Hello {{ user.first_name|default:user.email }}, you have {{ unread_count }} unread notifications</h2>
+            <h2 class="text-center mb-4">
+                {% if unread_count == 0 %}
+                    Hello {{ user.first_name|default:user.email }}, you're up to date!
+                {% elif unread_count == 1 %}
+                    Hello {{ user.first_name|default:user.email }}, you have 1 unread notification.
+                {% else %}
+                    Hello {{ user.first_name|default:user.email }}, you have {{ unread_count }} unread notifications.
+                {% endif %}
+            </h2>
         </div>
 
         {% if notifications %}
