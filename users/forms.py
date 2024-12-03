@@ -1,5 +1,5 @@
 from django import forms
-from .models import Profile, Project, File, Event, RSVP, CIO
+from .models import Profile, Project, File, Event, RSVP, CIO, SupportMessage
 
 
 class ProfileUpdateForm(forms.ModelForm):
@@ -55,3 +55,11 @@ class RSVPForm(forms.ModelForm):
     class Meta:
         model = RSVP
         fields = []
+
+class SupportForm(forms.ModelForm):
+    class Meta:
+        model = SupportMessage
+        fields = ['message']
+        widgets = {
+            'message': forms.Textarea(attrs={'placeholder': 'Input support message...', 'rows': 4}),
+        }

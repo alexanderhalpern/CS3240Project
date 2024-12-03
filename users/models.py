@@ -127,3 +127,13 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notification for {self.user.username}: {self.content[:30]}"
+    
+class SupportMessage(models.Model):
+    #model for support message
+    #support message will be associated with only one user
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="support_messages")
+    message = models.TextField()
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message from {self.user.username} at {self.submitted_at}"
