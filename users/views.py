@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect,  get_object_or_404, reverse
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import CIO, Profile, Project, Event, RSVP
-from .forms import ProfileUpdateForm, ProjectForm, FileForm, EventForm, CIOForm
+from .forms import ProfileUpdateForm, ProjectForm, FileForm, EventForm, CIOForm, SupportForm
 import datetime
 import calendar
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
@@ -195,6 +195,21 @@ def project_modal(request, project_id):
         'description': project.description,
     }
     return render(request, 'project/modal.html', context)
+
+@login_required
+def contact_support(request):
+    if request.method == "POST":
+        form = SupportForm(request.POST)
+        if form.is_valid():
+            support_message = form.save(commit=False)
+            support_message.user = request.user
+            support_message.save()
+            messages.success(request, "Your message has been submitted. We'll get back to you soon!")
+            return redirect('users:home')
+    else:
+        form = SupportForm()
+
+    return render(request, 'user/support.html', {'form': form})
 
 
 @login_required
