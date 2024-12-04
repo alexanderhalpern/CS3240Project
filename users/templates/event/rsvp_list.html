@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSVP List - {{ event.name }}</title>
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+</head>
+<style>
+     .rsvp-container {
+            background-color: #f9f9f9;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .rsvp-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .rsvp-details p {
+            font-size: 1.1rem;
+        }
+
+        .list-group-item {
+            font-size: 1.1rem;
+            padding: 12px;
+        }
+
+        .list-group-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+        }
+</style>
+<body>
+    <div class="container mt-5 rsvp-container">
+        <div class="rsvp-header">
+            <h1>RSVP List for <span class="text-primary">{{ event.name }}</span></h1>
+            <p class="lead">Hosted by {{ event.cio.name }}</p>
+        </div>
+
+        <div class="rsvp-details">
+            <p><strong>Date:</strong> {{ event.date|date:"F j, Y" }}</p>
+            <p><strong>Time:</strong> {{ event.time|date:"g:i A" }}</p>
+        </div>
+
+        <div class="mt-4">
+            {% if rsvps.exists %}
+                <h3 class="text-center">Attendees:</h3>
+                <ul class="list-group">
+                    {% for rsvp in rsvps %}
+                        <li class="list-group-item">
+                            {{ rsvp.user.username }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted text-center">No one has RSVP'd for this event yet.</p>
+            {% endif %}
+        </div>
+
+        <div class="mt-4">
+            <a href="{% url 'users:cio-calendar' slug=event.cio.slug %}" class="btn btn-primary btn-lg">Back to Calendar</a>
+        </div>
+    </div>
+
+    {% bootstrap_javascript %}
+</body>
+</html>

@@ -31,6 +31,8 @@ urlpatterns = [
     path('cio/<slug:slug>/calendar/', views.calendar_view, name='cio-calendar'),
     path('cio/<slug:slug>/members/add/',
          views.add_cio_member, name='add-cio-member'),
+    path('event/<int:event_id>/rsvp/', views.rsvp_event, name='rsvp_event'),
+    path('event/<int:event_id>/rsvps/', views.view_rsvps, name='view_rsvps'),
     path('cio/<slug:slug>/admins/add/',
          views.add_cio_admin, name='add-cio-admin'),
     path('cio/<slug:slug>/members/', views.cio_members, name='cio-members'),

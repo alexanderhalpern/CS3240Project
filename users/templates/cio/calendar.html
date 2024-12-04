@@ -38,8 +38,24 @@
                         <small class="text-muted">
                             {{ event.date|date:"F j, Y" }} at {{ event.time|date:"g:i A" }}
                         </small>
+                        <div class="d-flex align-items-center justify-content-between mt-2">
+                            {% if request.user in event.cio.members.all %}
+                                <form method="POST" action="{% url 'users:rsvp_event' event.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    {% if event.id in user_rsvps %}
+                                        <button type="submit" class="btn btn-danger btn-sm">Cancel RSVP</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-success btn-sm">RSVP</button>
+                                    {% endif %}
+                                </form>
+                            {% else %}
+                                <p class="text-muted">You must be a member to RSVP.</p>
+                            {% endif %}
+
+                            <a href="{% url 'users:view_rsvps' event_id=event.id %}" class="btn btn-primary btn-sm mt-2">View Who's Coming</a>
+                        </div>
+
                         <p class="mb-0">{{ event.description }}</p>
-                      
                         {% if request.user in cio.admins.all %}
                             <form method="POST" action="{% url 'users:delete_event' event_id=event.id %}" style="display: inline;">
                                 {% csrf_token %}

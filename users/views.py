@@ -297,18 +297,12 @@ def calendar_view(request, slug):
     now = datetime.datetime.now().time()
 
     user_rsvps = RSVP.objects.filter(user=request.user, event__cio=cio).values_list(
-        'event_id', flat=True) if request.user.is_authenticated else []
-
-    upcoming_events = (
-        Event.objects.filter(cio=cio, date__gte=today)
-        .exclude(date=today, time__lt=now)  # Exclude past events for today
-        .order_by('date', 'time')[:5]
-    )
+        'event_id', flat=True
+    ) if request.user.is_authenticated else []
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        events = Event.objects.filter(
-            date__year=today.year, date__month=today.month, cio=cio
-        )
+        events = Event.objects.filter(date__gte=today, cio=cio)
+        
         event_list = [
             {
                 'id': event.id,
@@ -321,11 +315,18 @@ def calendar_view(request, slug):
         ]
         return JsonResponse(event_list, safe=False)
 
+    upcoming_events = (
+        Event.objects.filter(cio=cio, date__gte=today)
+        .exclude(date=today, time__lt=now)
+        .order_by('date', 'time')[:5]
+    )
+
     context = {
         'today': today,
         'year': today.year,
         'cio': cio,
-        'upcoming_events': upcoming_events,  # Include upcoming events
+        'upcoming_events': upcoming_events,
+        'user_rsvps': user_rsvps,
     }
     return render(request, 'cio/calendar.html', context)
 
@@ -390,12 +391,36 @@ def membersView(request, id):
 @login_required
 def rsvp_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
-    if request.user.profile.is_pma_admin:
+
+    if request.user not in event.cio.members.all():
+        return HttpResponseForbidden("You must be a member of this organization to RSVP.")
+
+    if request.method == 'POST':
+        rsvp, created = RSVP.objects.get_or_create(event=event, user=request.user)
+        if not created: 
+            rsvp.delete()
+            print(f"RSVP removed for user {request.user} and event {event.id}")
+        else:
+            print(f"RSVP added for user {request.user} and event {event.id}")
+
         return redirect('users:cio-calendar', slug=event.cio.slug)
-    rsvp, created = RSVP.objects.get_or_create(event=event, user=request.user)
-    if not created:
-        rsvp.delete()
-    return redirect('users:cio-calendar', slug=event.cio.slug)
+
+    return HttpResponseForbidden("Invalid request method.")
+
+
+@login_required
+def view_rsvps(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+
+    if request.user not in event.cio.admins.all():
+        return HttpResponseForbidden("You are not authorized to view RSVPs for this event.")
+
+    rsvps = RSVP.objects.filter(event=event)
+    context = {
+        'event': event,
+        'rsvps': rsvps,
+    }
+    return render(request, 'event/rsvp_list.html', context)
 
 
 @login_required
