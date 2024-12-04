@@ -6,13 +6,15 @@
     {% bootstrap_css %}
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
     <div class="container mt-5">
-        <div class="mb-3">
-            <a href="{% url 'users:cio-dashboard' slug=cio.slug %}" class="btn btn-outline-secondary">Back to Dashboard</a>
-        </div>
-        <div class="d-flex align-items-center justify-content-between">
-            <h2 class="text-center mb-4">{{ cio.name }} Calendar</h2> 
+        <div class="d-flex align-items-center justify-content-center mb-4 position-relative">
+            <a href="{% url 'users:cio-dashboard' slug=cio.slug %}" class="btn btn-outline-secondary position-absolute start-0">
+                Back to Dashboard
+            </a>
+            <h2 class="mb-0 text-center">Calendar - {{ cio.name }}</h2>
             {% if request.user.is_authenticated and request.user in cio.admins.all %}
-                <a href="{% url 'users:create_event' slug=cio.slug %}" class="btn btn-primary mb-4">Create Event</a>
+                <a href="{% url 'users:create_event' slug=cio.slug %}" class="btn btn-primary position-absolute end-0">
+                    Create Event
+                </a>
             {% endif %}
         </div>
     
