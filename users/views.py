@@ -251,6 +251,7 @@ def cio_dashboard(request, slug):
     ).exclude(members=request.user)
 
     is_admin = request.user in cio.admins.all()
+    announcements = Announcement.objects.filter(cio=cio).order_by('-created_at')
 
     context = {
         'user': request.user,
@@ -259,7 +260,8 @@ def cio_dashboard(request, slug):
         'otherProjects': other_projects,
         'userProjects': user_projects,
         'cio': cio,
-        'is_cio_admin': is_admin,
+        'is_admin': is_admin,
+        'announcements': announcements,
     }
     return render(request, "cio/dashboard.html", context)
 
