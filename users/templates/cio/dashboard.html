@@ -48,28 +48,6 @@
             </a>
         </div>
     {% endif %}
-    
-    <div class="announcements-section">
-        <h3>Announcements</h3>
-        <div class="announcements-list" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;">
-            {% for announcement in announcements %}
-                <div class="announcement">
-                    <p><strong>{{ announcement.created_by.username }}</strong> ({{ announcement.created_at|date:"M d, Y H:i" }}):</p>
-                    <p>{{ announcement.content }}</p>
-                    <hr>
-                </div>
-            {% empty %}
-                <p>No announcements yet.</p>
-            {% endfor %}
-        </div>
-        {% if is_admin %}
-        <form method="POST" action="{% url 'users:create-announcement' cio.slug %}">
-            {% csrf_token %}
-            <textarea name="content" rows="3" placeholder="Make announcement here" required></textarea>
-            <button type="submit" class="btn btn-primary">Post Announcement</button>
-        </form>
-        {% endif %}
-    </div>
 
     <div class="row g-4 mb-5">
         <div class="col-md-4">
@@ -346,9 +324,4 @@
     })
 })()
 </script>
-<footer class="footer">
-    <div class="footer-content">
-        <p>© 2024 Software Engineering group A-16. This is a class project. The system is not monitored and no real information should be submitted.</p>
-    </div>
-</footer>
 {% endblock %}

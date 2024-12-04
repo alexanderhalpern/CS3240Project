@@ -11,7 +11,7 @@
         <a class="btn btn-primary" href="https://25live.collegenet.com/pro/virginia#!/home/search/location/availability/1557295" target="_blank">Reserve Space</a>
     </div>
     
-    {% if user == project.created_by %}
+    {% if user.id == project.created_by.id %}
     <div class="mt-4 border-top pt-4">
         <form action="{% url 'users:delete-project' project.id %}" method="POST" 
               onsubmit="return confirm('Are you sure you want to delete {{ project.name|escapejs }}? This action cannot be undone.');">
