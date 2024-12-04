@@ -39,6 +39,6 @@ urlpatterns = [
     path('mailbox/', views.mailbox, name='mailbox'),
     path('notifications/<int:notification_id>/mark-as-read/', views.mark_as_read, name='mark_as_read'),
     path('mark-all-as-read/', views.mark_all_as_read, name='mark_all_as_read'),
-    path('contact-support/', views.contact_support, name='contact-support'),
-    path('support-messages/', views.support_messages, name='support-messages')
+    path('contact-support/', views.contact_support, name='contact_support'),
+    path('support-messages/', views.support_messages, name='support_messages')
 ]
