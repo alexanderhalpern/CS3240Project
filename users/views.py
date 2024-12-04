@@ -392,9 +392,6 @@ def membersView(request, id):
 def rsvp_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
 
-    if request.user not in event.cio.members.all():
-        return HttpResponseForbidden("You must be a member of this organization to RSVP.")
-
     if request.method == 'POST':
         rsvp, created = RSVP.objects.get_or_create(event=event, user=request.user)
         if not created: 
