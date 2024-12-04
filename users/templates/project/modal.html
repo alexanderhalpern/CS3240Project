@@ -11,7 +11,7 @@
         <button class="btn btn-primary" onclick="redirectToBooking()">Reserve Space</button>
     </div>
     
-    {% if user == project.created_by %}
+    {% if user.id == project.created_by.id %}
     <div class="mt-4 border-top pt-4">
         <form action="{% url 'users:delete-project' project.id %}" method="POST" 
               onsubmit="return confirm('Are you sure you want to delete {{ project.name|escapejs }}? This action cannot be undone.');">
