@@ -28,8 +28,10 @@ def home(request):
         print(cios)
         slugs = [cio.slug for cio in cios]
         print(slugs)
-        unread_count = Notification.objects.filter(user=request.user, is_read=False).count() #for mailbox button on dropdown
-        return render(request, 'home.html', {'cios': cios, 'unread_count': unread_count})
+        if request.user.is_authenticated:
+            unread_count = Notification.objects.filter(user=request.user, is_read=False).count() #for mailbox button on dropdown
+            return render(request, 'home.html', {'cios': cios, 'unread_count': unread_count})
+        return render(request, 'home.html',{'cios': cios} )
     #return render(request, 'home.html')
     return render(request, 'user/login.html')
 
