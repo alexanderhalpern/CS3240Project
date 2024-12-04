@@ -217,11 +217,12 @@
                                 <i class="bi bi-text-paragraph me-1"></i>Project Description
                             </label>
                             <textarea class="form-control" 
-                                    id="projectDescription" 
-                                    name="description" 
-                                    rows="4"
-                                    required
-                                    placeholder="Describe your project (minimum 10 characters)"></textarea>
+                                      id="projectDescription" 
+                                      name="description" 
+                                      rows="4"
+                                      required
+                                      placeholder="Describe your project (minimum 10 characters)"
+                                      oninput="updateCharCount()"></textarea>
                             <div class="invalid-feedback" id="descriptionError">
                                 Please provide a project description of at least 10 characters.
                             </div>
@@ -229,6 +230,20 @@
                                 0 characters
                             </small>
                         </div>
+                        
+                        <script>
+                            function updateCharCount() {
+                                var description = document.getElementById('projectDescription').value;
+                                var charCount = document.getElementById('charCount');
+                                charCount.textContent = description.length + ' characters';
+                                
+                                if (description.length < 10) {
+                                    document.getElementById('descriptionError').style.display = 'block';
+                                } else {
+                                    document.getElementById('descriptionError').style.display = 'none';
+                                }
+                            }
+                        </script>
 
                         <!-- Submit Button -->
                         <div class="d-grid">
