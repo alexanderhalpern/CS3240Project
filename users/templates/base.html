@@ -75,11 +75,17 @@
                                     </li>
                                     <li>
                                         <a class="dropdown-item" href="{% url 'users:mailbox' %}">
-                                            <i class="bi bi-envelope me-2"></i>
-                                            Mailbox
-                                            {% if unread_count > 0 %}
-                                                <span class="badge bg-danger">{{ unread_count }}</span>
-                                            {% endif %}
+                                            <i class="bi bi-envelope me-2"></i>Mailbox
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'users:contact_support' %}">
+                                            <i class="bi bi-envelope-open me-2"></i>Contact Support
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'users:support_messages' %}">
+                                            <i class="bi bi-chat-left-text me-2"></i>Support Messages
                                         </a>
                                     </li>
                                     <li>
