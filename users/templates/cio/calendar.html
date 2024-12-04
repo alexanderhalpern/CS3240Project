@@ -1,23 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Calendar</title>
-    {% load bootstrap5 %}
-    {% bootstrap_css %}
-</head>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends 'base.html' %}
+
+{% block head %}
     <title>Event Calendar</title>
     {% load bootstrap5 %}
     {% bootstrap_css %}
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
-</head>
-<body>
+{% endblock %}
+{% block content %}
     <div class="container mt-5">
         <div class="mb-3">
             <a href="{% url 'users:cio-dashboard' slug=cio.slug %}" class="btn btn-outline-secondary">Back to Dashboard</a>
@@ -73,10 +62,11 @@
 
         <div id="calendar"></div>
     </div>
+    {% endblock %}
 
+    {% block extra_js %}
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     {% bootstrap_javascript %}
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar');
@@ -121,7 +111,8 @@
             $('#eventModal').modal('show');
         }
     </script>
-
+    {% endblock %}
+{% block modals %}
     <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -140,13 +131,7 @@
         </div>
     </div> 
 </body>
-
-<footer class="footer">
-    <div class="footer-content">
-        <p>© 2024 Software Engineering group A-16. This is a class project. The system is not monitored and no real information should be submitted.</p>
-    </div>
-</footer>
-</html>
+{% endblock %}
 
 
 

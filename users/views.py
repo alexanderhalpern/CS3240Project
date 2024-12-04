@@ -253,6 +253,7 @@ def cio_dashboard(request, slug):
     other_projects = Project.objects.filter(
         cio=cio
     ).exclude(members=request.user)
+    total_projects = user_projects.count() + other_projects.count()
 
     is_admin = request.user in cio.admins.all()
     announcements = Announcement.objects.filter(cio=cio).order_by('-created_at')
@@ -263,6 +264,7 @@ def cio_dashboard(request, slug):
         'form': form,
         'otherProjects': other_projects,
         'userProjects': user_projects,
+        'totalProjects': total_projects,
         'cio': cio,
         'is_admin': is_admin,
         'announcements': announcements,

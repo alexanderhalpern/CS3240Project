@@ -72,7 +72,7 @@
             <div class="card border-0 bg-info bg-opacity-10 h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-graph-up display-4 text-info mb-3"></i>
-                    <h3 class="fw-bold">{{ userProjects|length|add:otherProjects|length }}</h3>
+                    <h3 class="fw-bold">{{ totalProjects }}</h3>
                     <p class="text-muted mb-0">Total Projects</p>
                 </div>
             </div>
@@ -189,11 +189,7 @@
                 <div class="modal-header bg-light">
                     <h5 class="modal-title fw-bold" id="createProjectModalLabel">
                         <i class="bi bi-plus-circle me-2"></i>
-                        {% if user.profile.is_pma_admin %}
                             Create New Project
-                        {% else %}
-                            View Projects
-                        {% endif %}
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -221,18 +217,24 @@
                                 <i class="bi bi-text-paragraph me-1"></i>Project Description
                             </label>
                             <textarea class="form-control" 
-                                    id="projectDescription" 
-                                    name="description" 
-                                    rows="4"
-                                    required
-                                    placeholder="Describe your project (minimum 10 characters)"></textarea>
-                            <div class="invalid-feedback" id="descriptionError">
-                                Please provide a project description of at least 10 characters.
-                            </div>
+                                      id="projectDescription" 
+                                      name="description" 
+                                      rows="4"
+                                      required
+                                      placeholder="Describe your project (minimum 10 characters)"
+                                      oninput="updateCharCount()"></textarea>
                             <small class="text-muted position-absolute end-0 bottom-0 mb-1 me-2" id="charCount">
                                 0 characters
                             </small>
                         </div>
+                        
+                        <script>
+                            function updateCharCount() {
+                                var description = document.getElementById('projectDescription').value;
+                                var charCount = document.getElementById('charCount');
+                                charCount.textContent = description.length + ' characters';
+                            }
+                        </script>
 
                         <!-- Submit Button -->
                         <div class="d-grid">
