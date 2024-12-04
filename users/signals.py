@@ -58,5 +58,5 @@ def create_notifications_for_announcement(sender, instance, created, **kwargs):
         for member in members:
             Notification.objects.create(
                 user=member,
-                content=f"New announcement in {instance.cio.name}: {instance.content}"
+                content=f"New announcement in {instance.cio.name} by {instance.created_by.username}: {instance.content}"
             )
