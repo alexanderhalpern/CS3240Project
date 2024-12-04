@@ -8,7 +8,7 @@
     <div class="d-flex gap-2 mb-4">
         <a class="btn btn-primary" href="{% url 'users:project-files' project.id %}">View Files</a>
         <a class="btn btn-primary" href="{% url 'users:view-members' project.id %}">Members</a>
-        <button class="btn btn-primary" onclick="redirectToBooking()">Reserve Space</button>
+        <a class="btn btn-primary" href="https://25live.collegenet.com/pro/virginia#!/home/search/location/availability/1557295" target="_blank">Reserve Space</a>
     </div>
     
     {% if user.id == project.created_by.id %}
