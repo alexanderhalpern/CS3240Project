@@ -52,7 +52,8 @@
 <body>
     <div class="form-container">
         <h2>Update Your Profile</h2>
-        <form method="post">
+        
+        <form method="POST" enctype="multipart/form-data"> 
             {% csrf_token %}
 
             <div class="mb-3">
