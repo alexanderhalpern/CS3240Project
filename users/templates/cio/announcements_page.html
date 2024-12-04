@@ -9,7 +9,9 @@
         <a href="{% url 'users:cio-dashboard' slug=cio.slug %}" class="btn btn-outline-primary">
             <i class="bi bi-arrow-left"></i> Back to Dashboard
         </a>
-        <h1 class="mb-0">Announcements</h1>
+        <div class="d-flex justify-content-center" style="height: 100vh;">
+            <h1 class="mb-0">Announcements</h1>
+        </div>
         {% if is_admin %}
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAnnouncementModal">
                 <i class="bi bi-megaphone me-2"></i>Add Announcement
