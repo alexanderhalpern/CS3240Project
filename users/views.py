@@ -220,7 +220,7 @@ def support_messages(request):
         'messages': messages
     }
 
-    return render(request, 'admin/support_messages.html', context)
+    return render(request, 'user/support_messages.html', context)
 
 @login_required
 def cio_dashboard(request, slug):
