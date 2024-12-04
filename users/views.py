@@ -568,3 +568,26 @@ def create_announcement(request, slug):
         else:
             return HttpResponseForbidden('You are not admin')
     return HttpResponseNotAllowed(['POST'])
+
+@login_required
+def announcements_page(request, slug):
+    cio = get_object_or_404(CIO, slug=slug)
+    if request.user not in cio.admins.all() and request.user not in cio.members.all():
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    if request.method == 'POST':
+        if request.user in cio.admins.all():
+            content = request.POST.get('content')
+            if content:
+                Announcement.objects.create(cio=cio, created_by=request.user, content=content)
+            else:
+                messages.error(request, "Announcement box is empty")
+        else:
+            return HttpResponseForbidden("You are not admin")
+
+    announcements = Announcement.objects.filter(cio=cio).order_by('-created_at')
+    return render(request, 'cio/announcements_page.html', {
+        'cio': cio,
+        'announcements': announcements,
+        'is_admin': request.user in cio.admins.all(),
+    })
