@@ -6,7 +6,7 @@ from .models import CIO, Profile, Project, Event, RSVP
 from .forms import ProfileUpdateForm, ProjectForm, FileForm, EventForm, CIOForm, SupportForm
 import datetime
 import calendar
-from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse, HttpResponseNotAllowed
 from django.contrib import messages
 from django.contrib.auth.models import User
 from .models import Notification, SupportMessage
@@ -419,11 +419,19 @@ def create_event(request, slug):
     return render(request, 'event/create.html', {'form': form, 'cio': cio})
 
 
-@user_passes_test(is_admin)
+
+@login_required
 def delete_event(request, event_id):
-    event = get_object_or_404(Event, id=event_id, created_by=request.user)
-    event.delete()
-    return redirect('users:cio-calendar', slug=event.cio.slug)
+    event = get_object_or_404(Event, id=event_id)
+    if request.method == 'POST':
+        if request.user in event.cio.admins.all():
+            event.delete()
+            messages.success(request, 'Event deleted successfully.')
+            return redirect('users:cio-calendar', slug=event.cio.slug)  # Corrected
+        else:
+            return HttpResponseForbidden('You are not authorized to delete this event.')
+    return HttpResponseNotAllowed(['POST'])
+
 
 
 def logout_view(request):

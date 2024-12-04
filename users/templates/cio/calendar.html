@@ -16,20 +16,6 @@
     {% load bootstrap5 %}
     {% bootstrap_css %}
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
-    <script>
-        document.getElementById('rsvpButton').addEventListener('click', function() {
-            fetch(`/rsvp-event/${event.id}/`, {
-                method: 'POST',
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
-            })
-            .then(response => response.json())
-            .then(data => {
-                this.innerText = data.rsvp ? 'Cancel RSVP' : 'RSVP';
-                this.classList.toggle('btn-outline-danger', data.rsvp);
-                this.classList.toggle('btn-outline-success', !data.rsvp);
-            });
-        });
-    </script
 </head>
 <body>
     <div class="container mt-5">
@@ -53,6 +39,13 @@
                             {{ event.date|date:"F j, Y" }} at {{ event.time|date:"g:i A" }}
                         </small>
                         <p class="mb-0">{{ event.description }}</p>
+                      
+                        {% if request.user in cio.admins.all %}
+                            <form method="POST" action="{% url 'users:delete_event' event_id=event.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm mt-2">Delete Event</button>
+                            </form>
+                        {% endif %}
                     </li>
                 {% endfor %}
             </ul>
@@ -129,6 +122,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> 
 </body>
 </html>
+
