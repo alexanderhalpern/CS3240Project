@@ -1,6 +1,6 @@
 from allauth.account.signals import user_logged_in
 from django.dispatch import receiver
-from .models import Profile
+from .models import Announcement, Profile
 from django.db.models.signals import m2m_changed, post_save
 from django.contrib.auth.models import User
 from .models import CIO, Event, Notification
@@ -49,4 +49,14 @@ def notify_event_created(sender, instance, created, **kwargs):
             Notification.objects.create(
                 user=member,
                 content=f"A new event has been scheduled in the club {instance.cio.name}: {instance.name} on {instance.date} at {instance.time}."
+            )
+
+@receiver(post_save, sender=Announcement)
+def create_notifications_for_announcement(sender, instance, created, **kwargs):
+    if created:
+        members = instance.cio.members.all()
+        for member in members:
+            Notification.objects.create(
+                user=member,
+                content=f"New announcement in {instance.cio.name} by {instance.created_by.username}: {instance.content}"
             )
