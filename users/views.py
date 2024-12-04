@@ -2,8 +2,8 @@ import os
 from django.shortcuts import render, redirect,  get_object_or_404, reverse
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import CIO, Profile, Project, Event, RSVP
-from .forms import ProfileUpdateForm, ProjectForm, FileForm, EventForm, CIOForm, SupportForm
+from .models import CIO, Profile, Project, Event, RSVP, AdminFile
+from .forms import ProfileUpdateForm, ProjectForm, FileForm, EventForm, CIOForm, SupportForm, AdminFileUploadForm
 import datetime
 import calendar
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse, HttpResponseNotAllowed
@@ -372,6 +372,40 @@ def filesView(request, id):
         'cio': project.cio,
     }
     return render(request, 'project/files.html', context)
+
+def admin_files_view(request, slug):
+   
+    cio = get_object_or_404(CIO, slug=slug)
+
+    if request.user not in cio.admins.all():
+        return HttpResponseForbidden("You are not authorized to view or upload admin files.")
+
+    if request.method == 'POST' and 'file' in request.FILES:
+        form = AdminFileUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            admin_file = form.save(commit=False)  
+            admin_file.uploaded_by = request.user
+            admin_file.club = cio 
+
+            uploaded_file = request.FILES['file']
+            print(f"Uploaded file name: {uploaded_file.name}")
+
+            admin_file.save() 
+            messages.success(request, 'Admin file uploaded successfully.')
+            return redirect('users:cio-dashboard', slug=cio.slug) 
+    else:
+        form = AdminFileUploadForm()
+
+    admin_files = AdminFile.objects.filter(club=cio)
+
+    context = {
+        'cio': cio,
+        'admin_files': admin_files,
+        'form': form,
+    }
+
+    return render(request, "admin/admin_files.html", context)
+
 
 
 @login_required

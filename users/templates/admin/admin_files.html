@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3">{{ cio.name }}</h1>
+        <h3>Admin Files Management</h3>
+    </div>
+
+    <div class="mb-5">
+        <h3 class="fw-bold">Admin Files</h3>
+
+        {% if admin_files %}
+            <div class="list-group mb-4">
+                {% for file in admin_files %}
+                    <a href="{{ file.file.url }}" class="list-group-item list-group-item-action" target="_blank">
+                        <strong>{{ file.file.name }}</strong> - 
+                        Uploaded by {{ file.uploaded_by.username }} on {{ file.uploaded_at }}
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">No admin files available.</p>
+        {% endif %}
+        
+        <div class="mb-4">
+            <a href="{% url 'users:cio-dashboard' slug=cio.slug %}" class="btn btn-secondary w-100">
+                &larr; Back to CIO Dashboard
+            </a>
+        </div>
+        
+        <h4 class="fw-bold mb-3">Upload New Admin File</h4>
+        <form method="POST" enctype="multipart/form-data" class="border p-4 rounded shadow-sm">
+            {% csrf_token %}
+            
+            <div class="form-group mb-3">
+                <label for="file" class="form-label">Choose File</label>
+                {{ form.file }}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Upload File</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -11,7 +11,7 @@ class CIO(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField()
-    image = models.ImageField(upload_to='cios/')
+    image = models.ImageField(upload_to='cios/', blank = True, null = True)
     admins = models.ManyToManyField(
         User, related_name='admin_cios', blank=True)
     members = models.ManyToManyField(
@@ -90,6 +90,16 @@ class File(models.Model):
 
     def __str__(self):
         return self.file_name
+    
+
+class AdminFile(models.Model):
+    file = models.FileField(upload_to='admin_files/')
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    club = models.ForeignKey(CIO, on_delete=models.CASCADE)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.file.name
 
 
 class Event(models.Model):

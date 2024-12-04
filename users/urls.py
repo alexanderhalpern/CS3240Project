@@ -36,6 +36,7 @@ urlpatterns = [
     path('cio/<slug:slug>/admins/add/',
          views.add_cio_admin, name='add-cio-admin'),
     path('cio/<slug:slug>/members/', views.cio_members, name='cio-members'),
+    path('cio/<slug:slug>/admin-files/', views.admin_files_view, name='admin-files'),
 
     path('add-cio/', views.add_cio, name='add-cio'),
     path('guest-view/', views.continue_as_guest, name="guest-view"),

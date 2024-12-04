@@ -1,5 +1,5 @@
 from django import forms
-from .models import Profile, Project, File, Event, RSVP, CIO, SupportMessage
+from .models import Profile, Project, File, Event, RSVP, CIO, SupportMessage, AdminFile
 
 
 class ProfileUpdateForm(forms.ModelForm):
@@ -39,6 +39,16 @@ class FileForm(forms.ModelForm):
         self.fields['title'].required = True
         self.fields['description'].required = False
         self.fields['keywords'].required = False
+
+
+class AdminFileUploadForm(forms.ModelForm):
+    class Meta:
+        model = AdminFile
+        fields = ['file']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['file'].required = True
 
 
 class EventForm(forms.ModelForm):
