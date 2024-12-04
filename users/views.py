@@ -85,6 +85,8 @@ def leave_cio(request, slug):
             cio.members.remove(request.user)
             messages.success(
                 request, f'You have left {cio.name}.')
+        if request.user in cio.admins.all():
+            cio.admins.remove(request.user)
         return redirect('users:cio-dashboard', slug=slug)
     return redirect('users:cio-dashboard', slug=slug)
 
