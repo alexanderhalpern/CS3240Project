@@ -23,7 +23,7 @@ def is_admin(user):
 
 
 def home(request):
-    if request.user.is_authenticated or request.session.get('is_guest', False):
+    if request.session.get('is_guest', False):
         cios = CIO.objects.all().order_by('name')
         print(cios)
         slugs = [cio.slug for cio in cios]
@@ -32,7 +32,6 @@ def home(request):
             unread_count = Notification.objects.filter(user=request.user, is_read=False).count() #for mailbox button on dropdown
             return render(request, 'home.html', {'cios': cios, 'unread_count': unread_count})
         return render(request, 'home.html',{'cios': cios} )
-    #return render(request, 'home.html')
     return render(request, 'user/login.html')
 
 def continue_as_guest(request):
