@@ -54,7 +54,7 @@
                 <p>No announcements yet.</p>
             {% endfor %}
         </div>
-        {% if profile.is_pma_admin %}
+        {% if is_admin %}
         <form method="POST" action="{% url 'users:create-announcement' cio.slug %}">
             {% csrf_token %}
             <textarea name="content" rows="3" placeholder="Make announcement here" required></textarea>
