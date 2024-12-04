@@ -27,6 +27,7 @@ urlpatterns = [
     path('cio/<slug:slug>/', views.cio_detail, name='cio-detail'),
     path('cio/<slug:slug>/join/', views.join_cio, name='join-cio'),
     path('cio/<slug:slug>/leave/', views.leave_cio, name='leave-cio'),
+    path('cio/<slug:slug>/create-announcement/', views.create_announcement, name='create-announcement'),
     path('cio/<slug:slug>/dashboard/', views.cio_dashboard, name="cio-dashboard"),
     path('cio/<slug:slug>/calendar/', views.calendar_view, name='cio-calendar'),
     path('cio/<slug:slug>/members/add/',

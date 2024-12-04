@@ -2,7 +2,7 @@ import os
 from django.shortcuts import render, redirect,  get_object_or_404, reverse
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import CIO, Profile, Project, Event, RSVP
+from .models import CIO, Announcement, Profile, Project, Event, RSVP
 from .forms import ProfileUpdateForm, ProjectForm, FileForm, EventForm, CIOForm, SupportForm
 import datetime
 import calendar
@@ -41,6 +41,7 @@ def continue_as_guest(request):
 @login_required
 def cio_detail(request, slug):
     cio = get_object_or_404(CIO, slug=slug)
+    announcements = cio.announcements.order_by('-created_at')
     user_projects = cio.projects.filter(members=request.user)
     other_projects = cio.projects.exclude(members=request.user)
     upcoming_events = cio.events.filter(
@@ -58,6 +59,7 @@ def cio_detail(request, slug):
         'is_member': is_member,
         'admins': cio.admins.all(),
         'members': cio.members.all(),
+        'announcements': announcements,
     }
     return render(request, 'cio/detail.html', context)
 
@@ -515,3 +517,18 @@ def join_project(request, project_id):
                 request, 'You are already a member of this project.')
 
     return redirect('users:view-members', project_id)
+
+@login_required
+def create_announcement(request, slug):
+    cio = get_object_or_404(CIO, slug=slug)
+    if request.method == 'POST':
+        if request.user in cio.admins.all():
+            content = request.POST.get('content')
+            if content:
+                Announcement.objects.create(cio=cio, created_by=request.user, content=content)
+            else:
+                messages.error(request, "Announcement empty")
+            return redirect('users:cio-dashboard', slug=slug)
+        else:
+            return HttpResponseForbidden('You are not admin')
+    return HttpResponseNotAllowed(['POST'])
