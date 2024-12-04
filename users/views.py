@@ -230,6 +230,8 @@ def cio_dashboard(request, slug):
     profile, created = Profile.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
+        if request.user not in cio.members.all():
+            return HttpResponseForbidden("You must be a member to create a project.")
         form = ProjectForm(request.POST)
         if form.is_valid():
             project = form.save(commit=False)
