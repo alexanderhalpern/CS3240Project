@@ -54,6 +54,14 @@
         <h2>Update Your Profile</h2>
         <form method="post">
             {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="date_joined" class="form-label">
+                    <i class="bi-calendar me-1"></i>Date Joined
+                </label>
+                <input type="text" class="form-control" id="date_joined" value="{{ user.date_joined|date:'F j, Y' }}" disabled>
+            </div>
+
             <div class="mb-3">
                 <label for="first_name" class="form-label">
                     <i class="bi-person-circle me-1"></i>First Name
