@@ -9,7 +9,7 @@ import calendar
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .models import Notification
+from .models import Notification, SupportMessage
 
 
 def is_admin(user):
@@ -209,8 +209,18 @@ def contact_support(request):
     else:
         form = SupportForm()
 
-    return render(request, 'user/support.html', {'form': form})
+    return render(request, 'user/contact-support.html', {'form': form})
 
+@login_required
+def support_messages(request):
+    #note to self: MAKE SURE THAT THIS MOVES FROM USER TO ADMIN PERMISSION ASAP
+    messages = SupportMessage.objects.all().order_by('-submitted_at')
+
+    context = {
+        'messages': messages
+    }
+
+    return render(request, 'admin/support_messages.html', context)
 
 @login_required
 def cio_dashboard(request, slug):
