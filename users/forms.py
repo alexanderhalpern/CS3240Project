@@ -61,5 +61,5 @@ class SupportForm(forms.ModelForm):
         model = SupportMessage
         fields = ['message']
         widgets = {
-            'message': forms.Textarea(attrs={'placeholder': 'Input support message...', 'rows': 4}),
+            '': forms.Textarea(attrs={'placeholder': 'Input support message...', 'rows': 4}),
         }
