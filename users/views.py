@@ -23,7 +23,7 @@ def is_admin(user):
 
 
 def home(request):
-    if request.session.get('is_guest', False):
+    if request.user.is_authenticated or request.session.get('is_guest', False):
         cios = CIO.objects.all().order_by('name')
         print(cios)
         slugs = [cio.slug for cio in cios]
