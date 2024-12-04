@@ -1,82 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Calendar</title>
-    {% load bootstrap5 %}
-    {% bootstrap_css %}
-</head>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Calendar</title>
-    {% load bootstrap5 %}
-    {% bootstrap_css %}
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
-</head>
-<body>
-    <div class="container mt-5">
-        <div class="mb-3">
-            <a href="{% url 'users:cio-dashboard' slug=cio.slug %}" class="btn btn-outline-secondary">Back to Dashboard</a>
-        </div>
-        <div class="d-flex align-items-center justify-content-between">
-            <h2 class="text-center mb-4">{{ cio.name }} Calendar</h2> 
-            {% if request.user.is_authenticated and request.user in cio.admins.all %}
-                <a href="{% url 'users:create_event' slug=cio.slug %}" class="btn btn-primary mb-4">Create Event</a>
-            {% endif %}
-        </div>
-    
-        {% if upcoming_events %}
-            <h4 class="mb-3">Upcoming Events</h4>
-            <ul class="list-group mb-4">
-                {% for event in upcoming_events %}
-                    <li class="list-group-item">
-                        <h5 class="mb-1">{{ event.name }}</h5>
-                        <small class="text-muted">
-                            {{ event.date|date:"F j, Y" }} at {{ event.time|date:"g:i A" }}
-                        </small>
-                        <div class="d-flex align-items-center justify-content-between mt-2">
-                            {% if request.user in event.cio.members.all %}
-                                <form method="POST" action="{% url 'users:rsvp_event' event.id %}" style="display:inline;">
-                                    {% csrf_token %}
-                                    {% if event.id in user_rsvps %}
-                                        <button type="submit" class="btn btn-danger btn-sm">Cancel RSVP</button>
-                                    {% else %}
-                                        <button type="submit" class="btn btn-success btn-sm">RSVP</button>
-                                    {% endif %}
-                                </form>
-                            {% else %}
-                                <p class="text-muted">You must be a member to RSVP.</p>
-                            {% endif %}
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
 
-                            <a href="{% url 'users:view_rsvps' event_id=event.id %}" class="btn btn-primary btn-sm mt-2">View Who's Coming</a>
-                        </div>
+{% block title %}Calendar - {{ cio.name }} - ClubHub{% endblock %}
 
-                        <p class="mb-0">{{ event.description }}</p>
-                        {% if request.user in cio.admins.all %}
-                            <form method="POST" action="{% url 'users:delete_event' event_id=event.id %}" style="display: inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-danger btn-sm mt-2">Delete Event</button>
-                            </form>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-muted">No upcoming events.</p>
+{% block content %}
+<div class="container mt-5">
+    <div class="mb-3">
+        <a href="{% url 'users:cio-dashboard' slug=cio.slug %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+    <div class="d-flex align-items-center justify-content-between">
+        <h2 class="text-center mb-4">{{ cio.name }} Calendar</h2>
+        {% if request.user.is_authenticated and request.user in cio.admins.all %}
+            <a href="{% url 'users:create_event' slug=cio.slug %}" class="btn btn-primary mb-4">Create Event</a>
         {% endif %}
-
-        
-
-        <div id="calendar"></div>
     </div>
 
+    {% if upcoming_events %}
+        <h4 class="mb-3">Upcoming Events</h4>
+        <ul class="list-group mb-4">
+            {% for event in upcoming_events %}
+                <li class="list-group-item">
+                    <h5 class="mb-1">{{ event.name }}</h5>
+                    <small class="text-muted">
+                        {{ event.date|date:"F j, Y" }} at {{ event.time|date:"g:i A" }}
+                    </small>
+                    <div class="d-flex align-items-center justify-content-between mt-2">
+                        {% if request.user in event.cio.members.all %}
+                            <form method="POST" action="{% url 'users:rsvp_event' event.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                {% if event.id in user_rsvps %}
+                                    <button type="submit" class="btn btn-danger btn-sm">Cancel RSVP</button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-success btn-sm">RSVP</button>
+                                {% endif %}
+                            </form>
+                        {% else %}
+                            <p class="text-muted">You must be a member to RSVP.</p>
+                        {% endif %}
+
+                        <a href="{% url 'users:view_rsvps' event_id=event.id %}" class="btn btn-primary btn-sm mt-2">View Who's Coming</a>
+                    </div>
+
+                    <p class="mb-0">{{ event.description }}</p>
+                    {% if request.user in cio.admins.all %}
+                        <form method="POST" action="{% url 'users:delete_event' event_id=event.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm mt-2">Delete Event</button>
+                        </form>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted">No upcoming events.</p>
+    {% endif %}
+
+    <div id="calendar"></div>
+</div>
+{% endblock %}
+
+{% block modals %}
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="eventDescription"></p>
+                <p><strong>Time:</strong> <span id="eventTime"></span></p>
+                {% if request.user.is_authenticated %}
+                    <button id="rsvpButton" class="btn btn-sm btn-outline-success mt-2">RSVP</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+    {% bootstrap_css %}
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block extra_scripts %}
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     {% bootstrap_javascript %}
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar');
@@ -88,7 +101,6 @@
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
                 events: function(fetchInfo, successCallback, failureCallback) {
-                    // Fetch events only for the current view's start and end date
                     fetch(`{% url "users:cio-calendar" cio.slug %}?start=${fetchInfo.startStr}&end=${fetchInfo.endStr}`, {
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'
@@ -105,7 +117,6 @@
             });
             calendar.render();
         });
-        
 
         function showEventModal(event) {
             var modalTitle = event.title;
@@ -121,32 +132,4 @@
             $('#eventModal').modal('show');
         }
     </script>
-
-    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p id="eventDescription"></p>
-                    <p><strong>Time:</strong> <span id="eventTime"></span></p>
-                    {% if request.user.is_authenticated %}
-                        <button id="rsvpButton" class="btn btn-sm btn-outline-success mt-2">RSVP</button>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div> 
-</body>
-
-<footer class="footer">
-    <div class="footer-content">
-        <p>© 2024 Software Engineering group A-16. This is a class project. The system is not monitored and no real information should be submitted.</p>
-    </div>
-</footer>
-</html>
-
-
-
+{% endblock %}
