@@ -24,12 +24,14 @@
             </form>
         {% endif %}
         {% else %}
-            <form action="{% url 'users:join-project' project.id %}" method="POST">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-person-plus me-2"></i>Join Project
-                </button>
-            </form>
+            {% if profile.is_pma_admin %}
+                <form action="{% url 'users:join-project' project.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-person-plus me-2"></i>Join Project
+                    </button>
+                </form>
+            {% endif %}
         {% endif %}
     </div>
 
