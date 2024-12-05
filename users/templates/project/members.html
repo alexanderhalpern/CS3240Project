@@ -47,11 +47,11 @@
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         {{ user.username }}
                         <div>
-                            <form method="POST" action="{% url 'handle-join-request' project_id user.id 'accept' %}" style="display:inline;">
+                            <form method="POST" action="{% url 'users:handle-join-request' project_id=project.id user_id=user.id action='accept' %}" style="display:inline;">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-success btn-sm">Accept</button>
                             </form>
-                            <form method="POST" action="{% url 'handle-join-request' project_id user.id 'reject' %}" style="display:inline;">
+                            <form method="POST" action="{% url 'users:handle-join-request' project_id=project.id user_id=user.id action='reject' %}" style="display:inline;">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger btn-sm">Reject</button>
                             </form>
