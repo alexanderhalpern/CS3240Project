@@ -493,6 +493,7 @@ def membersView(request, id):
 
     return render(request, 'project/members.html', {
         'project': project,
+        'project_id': project.id,
         'members': members,
         'cio': project.cio,
         'is_owner': is_owner

@@ -24,7 +24,7 @@
                 </form>
             {% endif %}
         {% else %}
-            <form method="post" action="{% url 'request-to-join-project' project_id %}">
+            <form method="post" action="{% url 'users:request-to-join-project' project_id=project.id %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-person-plus me-2"></i>Request to Join
