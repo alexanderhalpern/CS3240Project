@@ -233,6 +233,43 @@ def support_messages(request):
     return render(request, 'user/support_messages.html', context)
 
 @login_required
+def request_to_join_project(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+
+    if request.user not in project.cio.members.all():
+        messages.error(request, "You have to be in this club to make a request.")
+        return redirect('users:cio-dashboard', slug=project.cio.slug)
+
+    if request.user in project.members.all():
+        messages.warning(request, "You are already a member")
+    elif request.user in project.join_requests.all():
+        messages.warning(request, "You already made a request")
+    else:
+        project.join_requests.add(request.user)
+        messages.success(request, "Your request to join the project has been sent.")
+
+    return redirect('users:project-detail', project_id=project.id)
+
+@login_required
+def handle_join_request(request, project_id, user_id, action):
+    project = get_object_or_404(Project, id=project_id)
+
+    if request.user != project.created_by:
+        return HttpResponseForbidden("You are not the owner.")
+
+    user = get_object_or_404(User, id=user_id)
+
+    if action == 'accept':
+        project.members.add(user)
+        project.join_requests.remove(user)
+        messages.success(request, f"{user.first_name} was added")
+    elif action == 'reject':
+        project.join_requests.remove(user)
+        messages.info(request, f"{user.first_name}'s request has been rejected.")
+
+    return redirect('users:project-detail', project_id=project.id)
+
+@login_required
 def cio_dashboard(request, slug):
     cio = get_object_or_404(CIO, slug=slug)
     profile, created = Profile.objects.get_or_create(user=request.user)

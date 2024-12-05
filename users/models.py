@@ -53,7 +53,8 @@ class Project(models.Model):
         User, on_delete=models.CASCADE, related_name='created_projects')
     members = models.ManyToManyField(User, related_name='joined_projects')
     cio = models.ForeignKey(CIO, on_delete=models.CASCADE,
-                            related_name='projects')  # New field
+                            related_name='projects')
+    join_requests = models.ManyToManyField(User, related_name='join_requests', blank=True)
 
     def __str__(self):
         return self.name
