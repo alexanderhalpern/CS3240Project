@@ -269,7 +269,7 @@ def handle_join_request(request, project_id, user_id, action):
     else:
         messages.error(request, "Invalid action.")
 
-    return redirect('view-members', id=project_id)
+    return redirect('users:view-members', id=project_id)
 
 @login_required
 def cio_dashboard(request, slug):
