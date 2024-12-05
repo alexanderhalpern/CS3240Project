@@ -34,7 +34,7 @@
                     <p><strong>Description:</strong> {{ file.description }}</p>
                     <p><strong>Keywords:</strong> {{ file.keywords }}</p>
                     <a href="{{ file.file.url }}" class="card-link" target="_blank">View</a>
-                    {% if request.user == project.created_by or request.user == file.uploaded_by %}
+                    {% if request.user == project.created_by or request.user == file.uploaded_by or request.user.profile.is_pma_admin %}
                         <form action="{% url 'users:delete-file' file.id %}" method="POST" style="display:inline;">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger">Delete</button>
