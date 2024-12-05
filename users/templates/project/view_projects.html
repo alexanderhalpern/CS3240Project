@@ -1,0 +1,51 @@
+{% load static %}
+{% load bootstrap5 %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+</head>
+
+<body>
+     
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold">All Projects</h1>
+            <p class="lead text-muted">Explore all available projects hosted by our CIOs. Create an account to join!</p>
+        </div>
+
+        {% if projects %}
+            <div class="row g-4">
+                {% for project in projects %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold">{{ project.name }}</h5>
+                                <p class="card-text text-muted">Owner: {{ project.created_by.username }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="col-12 text-center">
+                <p>No projects available at the moment.</p>
+            </div>
+        {% endif %}
+
+        <div class="text-center mt-4">
+            <a href="{% url 'users:home' %}" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container text-center">
+            <p>© 2024 Software Engineering group A-16. This is a class project. The system is not monitored and no real information should be submitted.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
+

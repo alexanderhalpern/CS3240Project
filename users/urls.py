@@ -55,4 +55,6 @@ urlpatterns = [
     path('project/<int:project_id>/handle-join-request/<int:user_id>/<str:action>/', 
          views.handle_join_request, name='handle-join-request'),
     path('project/<int:id>/members/', views.membersView, name='view-members'),
+    path('view-projects/', views.view_projects, name='view-projects'),
+
 ]

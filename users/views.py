@@ -620,6 +620,10 @@ def remove_member(request, project_id, user_id):
 
     return redirect('users:view-members', project_id)
 
+def view_projects(request):
+    projects = Project.objects.all()
+    return render(request, 'project/view_projects.html', {'projects': projects})
+
 
 @login_required
 def join_project(request, project_id):

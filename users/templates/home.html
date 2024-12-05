@@ -114,6 +114,13 @@
         <div class="text-center mb-5">
             <h1 class="display-4 fw-bold">Student Organizations</h1>
             <p class="lead text-muted">Discover and join student organizations at UVA</p>
+                {% if not user.is_authenticated %}
+                    <div class="text-center mb-4">
+                        <a href="{% url 'users:view-projects' %}" class="btn btn-primary">
+                            View All Projects
+                         </a>
+                    </div>
+                {% endif %}
             {% if request.user.profile.is_pma_admin %}
             <div class="alert alert-primary d-inline-flex align-items-center px-4 py-3" role="alert">
                 <i class="bi bi-shield-check fs-4 me-2"></i>
@@ -163,7 +170,7 @@
         </div>
     </div>
     <footer class="footer">
-        <div class="footer-content">
+        <div class="footer-content text-center">
             <p>© 2024 Software Engineering group A-16. This is a class project. The system is not monitored and no real information should be submitted.</p>
         </div>
     </footer>
