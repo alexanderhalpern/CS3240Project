@@ -226,7 +226,7 @@
                         </script>
 
                         <div class="d-grid">
-                            { % if not request.user.profile.is_pma_admin %}
+                            {% if not request.user.profile.is_pma_admin %}
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="bi bi-check-circle me-2"></i>Create Project
                             </button>
