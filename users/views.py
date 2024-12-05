@@ -296,9 +296,11 @@ def update_profile(request):
 def delete_project(request, project_id):
     if request.method == 'POST':
         project = get_object_or_404(Project, id=project_id)
-        if request.user == project.created_by:
+        if request.user == project.created_by or request.user.profile.is_pma_admin:
             project.delete()
             return redirect('users:cio-dashboard', slug=project.cio.slug)
+
+    messages.error(request, "You do not have permission to delete this project.")
     return redirect('users:cio-dashboard', slug=project.cio.slug)
 
 
@@ -352,8 +354,15 @@ def filesView(request, id):
     project = get_object_or_404(Project, id=id)
 
     # Add authorization check
-    if not request.user.is_authenticated or request.user not in project.members.all():
+    if not request.user.is_authenticated:
         return HttpResponse(status=403)
+
+    if request.user.profile.is_pma_admin:
+        files = project.files.all()
+    elif request.user in project.members.all():
+        files = project.files.all()
+    else:
+        return HttpResponseForbidden("You do not have permission to view these files.")
 
     form = FileForm(request.POST or None, request.FILES or None)
 
@@ -390,7 +399,7 @@ def delete_file(request, file_id):
     file = get_object_or_404(File, id=file_id)
     project = file.project
 
-    if request.user == project.created_by or request.user == file.uploaded_by:
+    if request.user == project.created_by or request.user == file.uploaded_by or request.user.profile.is_pma_admin:
         file.delete()
         messages.success(request, 'Success')
         return redirect('users:project-files', id=project.id)
