@@ -24,7 +24,7 @@
             </form>
         {% endif %}
         {% else %}
-            {% if request.user.profile.is_pma_admin %}
+            {% if profile.is_pma_admin %}
                 <form action="{% url 'users:join-project' project.id %}" method="POST">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary">
