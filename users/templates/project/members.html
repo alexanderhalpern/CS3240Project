@@ -12,10 +12,17 @@
             </a>
         </div>
         <h1 class="mb-0">Members of {{ project.name }}</h1>
+        {% if request.user in project.members.all %}
         {% if is_owner %}
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">
                 <i class="bi bi-person-plus me-2"></i>Add Member
             </button>
+        {% else %}
+            <form method="POST" action="{% url 'users:leave-project' project.id %}" style="display:inline;">
+            {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Leave Project</button>
+            </form>
+        {% endif %}
         {% else %}
             <form action="{% url 'users:join-project' project.id %}" method="POST">
                 {% csrf_token %}

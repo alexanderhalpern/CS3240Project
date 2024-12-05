@@ -24,6 +24,8 @@ urlpatterns = [
          views.remove_member, name='remove-member'),
     path('projects/<int:project_id>/join/',
          views.join_project, name='join-project'),
+         path('projects/<int:project_id>/leave/',
+         views.leave_project, name='leave-project'),
     path('cio/<slug:slug>/', views.cio_detail, name='cio-detail'),
     path('cio/<slug:slug>/join/', views.join_cio, name='join-cio'),
     path('cio/<slug:slug>/leave/', views.leave_cio, name='leave-cio'),

@@ -562,6 +562,18 @@ def join_project(request, project_id):
     return redirect('users:view-members', project_id)
 
 @login_required
+def leave_project(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    if request.method == 'POST':
+        if request.user in project.members.all():
+            project.members.remove(request.user)
+            messages.success(request, 'You have left the project.')
+        else:
+            messages.warning(request, 'You are not a member of this project.')
+
+    return redirect('users:view-members', project_id)
+
+@login_required
 def create_announcement(request, slug):
     cio = get_object_or_404(CIO, slug=slug)
     if request.method == 'POST':
