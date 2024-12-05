@@ -262,6 +262,12 @@ def handle_join_request(request, project_id, user_id, action):
     if action == 'accept':
         project.members.add(user)
         project.join_requests.remove(user)
+
+        Notification.objects.create(
+            user=user,
+            content=f"Your join request for the project '{project.name}' has been accepted."
+        )
+        
         messages.success(request, f"{user.first_name} was added to the project.")
     elif action == 'reject':
         project.join_requests.remove(user)
