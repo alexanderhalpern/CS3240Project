@@ -2,7 +2,7 @@ import os
 from django.shortcuts import render, redirect,  get_object_or_404, reverse
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import CIO, Profile, Project, Event, RSVP, Announcement, AdminFile
+from .models import CIO, File, Profile, Project, Event, RSVP, Announcement, AdminFile
 from .forms import ProfileUpdateForm, ProjectForm, FileForm, EventForm, CIOForm, SupportForm, AdminFileUploadForm
 import datetime
 import calendar
@@ -360,6 +360,7 @@ def filesView(request, id):
     if request.method == 'POST' and form.is_valid():
         newFile = form.save(commit=False)
         newFile.project = project
+        newFile.uploaded_by = request.user
         newFile.file_name = request.FILES['file'].name
         newFile.file_size = request.FILES['file'].size
         newFile.file_type = os.path.splitext(request.FILES['file'].name)[
@@ -383,6 +384,18 @@ def filesView(request, id):
         'cio': project.cio,
     }
     return render(request, 'project/files.html', context)
+
+@login_required
+def delete_file(request, file_id):
+    file = get_object_or_404(File, id=file_id)
+    project = file.project
+
+    if request.user == project.created_by or request.user == file.uploaded_by:
+        file.delete()
+        messages.success(request, 'Success')
+        return redirect('users:project-files', id=project.id)
+    else:
+        return HttpResponseForbidden('You are not authorized.')
 
 def admin_files_view(request, slug):
    

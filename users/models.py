@@ -79,6 +79,8 @@ class File(models.Model):
     title = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     keywords = models.TextField(blank=True, null=True)
+    uploaded_by = models.ForeignKey(
+        User, related_name='uploaded_files', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         if self.file:

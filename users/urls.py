@@ -48,5 +48,6 @@ urlpatterns = [
     path('mark-all-as-read/', views.mark_all_as_read, name='mark_all_as_read'),
     path('contact-support/', views.contact_support, name='contact_support'),
     path('support-messages/', views.support_messages, name='support_messages'),
-    path('cio/<slug:slug>/announcements/', views.announcements_page, name='cio-announcements')
+    path('cio/<slug:slug>/announcements/', views.announcements_page, name='cio-announcements'),
+    path('file/<int:file_id>/delete/', views.delete_file, name='delete-file')
 ]
