@@ -82,6 +82,12 @@
                     <button class="btn btn-primary" onclick="redirectToBooking()">Reserve Space</button>
                 </div>
             </div>
+            {% if request.user == request.user.profile.is_pma_admin %}
+                <form action="{% url 'users:delete-file' file.id %}" method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            {% endif %}
         </div>
     </div>
 
