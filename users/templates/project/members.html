@@ -13,27 +13,50 @@
         </div>
         <h1 class="mb-0">Members of {{ project.name }}</h1>
         {% if request.user in project.members.all %}
-        {% if is_owner %}
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">
-                <i class="bi bi-person-plus me-2"></i>Add Member
-            </button>
-        {% else %}
-            <form method="POST" action="{% url 'users:leave-project' project.id %}" style="display:inline;">
-            {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Leave Project</button>
-            </form>
-        {% endif %}
-        {% else %}
-            {% if profile.is_pma_admin %}
-                <form action="{% url 'users:join-project' project.id %}" method="POST">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-person-plus me-2"></i>Join Project
-                    </button>
+            {% if is_owner %}
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+                    <i class="bi bi-person-plus me-2"></i>Add Member
+                </button>
+            {% else %}
+                <form method="POST" action="{% url 'users:leave-project' project.id %}" style="display:inline;">
+                {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Leave Project</button>
                 </form>
             {% endif %}
+        {% else %}
+            <form method="POST" action="{% url 'users:request-to-join-project' project.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-person-plus me-2"></i>Request to Join
+                </button>
+            </form>
         {% endif %}
     </div>
+
+    {% if is_owner %}
+        <h3>Join Requests</h3>
+        {% if project.join_requests.all %}
+            <ul class="list-group mb-4">
+                {% for user in project.join_requests.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ user.username }}
+                        <div>
+                            <form method="POST" action="{% url 'users:handle-join-request' project.id user.id 'accept' %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                            </form>
+                            <form method="POST" action="{% url 'users:handle-join-request' project.id user.id 'reject' %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                            </form>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No join requests at the moment.</p>
+        {% endif %}
+    {% endif %}
 
     <div class="row">
         {% for user in members %}
@@ -71,13 +94,13 @@
                             </div>
                             
                             {% if is_owner and user != project.created_by %}
-                                <form action="{% url 'users:remove-member' project.id user.id %}" method="POST" class="ms-2">
+                                <form method="POST" action="{% url 'users:remove-member' project.id user.id %}" class="ms-2">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-outline-danger btn-sm" 
                                             onclick="return confirm('Are you sure you want to remove this member?');">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
-                                              </svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                                        </svg>
                                     </button>
                                 </form>
                             {% endif %}

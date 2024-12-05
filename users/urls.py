@@ -49,5 +49,7 @@ urlpatterns = [
     path('contact-support/', views.contact_support, name='contact_support'),
     path('support-messages/', views.support_messages, name='support_messages'),
     path('cio/<slug:slug>/announcements/', views.announcements_page, name='cio-announcements'),
-    path('file/<int:file_id>/delete/', views.delete_file, name='delete-file')
+    path('file/<int:file_id>/delete/', views.delete_file, name='delete-file'),
+    path('<int:project_id>/request-join/', views.request_to_join_project, name='request-to-join-project'),
+    path('<int:project_id>/<int:user_id>/<str:action>/handle-request/', views.handle_join_request, name='handle-join-request')
 ]
