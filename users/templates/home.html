@@ -114,8 +114,17 @@
         <div class="text-center mb-5">
             <h1 class="display-4 fw-bold">Student Organizations</h1>
             <p class="lead text-muted">Discover and join student organizations at UVA</p>
+            {% if request.user.profile.is_pma_admin %}
+            <div class="alert alert-primary d-inline-flex align-items-center px-4 py-3" role="alert">
+                <i class="bi bi-shield-check fs-4 me-2"></i>
+                <div>
+                    <strong>Admin Access</strong>
+                    <p class="mb-0">You have PMA administrator privileges</p>
+                </div>
+            </div>
+        {% endif %}
         </div>
-    
+        
         {% if user.is_authenticated %}
             <div class="text-end mb-4">
                 <a href="{% url 'users:add-cio' %}" class="btn btn-primary">

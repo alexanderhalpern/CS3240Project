@@ -9,7 +9,7 @@
             <i class="bi bi-arrow-left"></i> Back to Dashboard
         </a>
         <h1>Files for {{ project.name }}</h1>
-        {% if profile.is_pma_admin %}
+        {% if not request.user.profile.is_pma_admin%}
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFileModal">
                 Add File
             </button>
@@ -36,7 +36,7 @@
                     <p><strong>Description:</strong> {{ file.description }}</p>
                     <p><strong>Keywords:</strong> {{ file.keywords }}</p>
                     <a href="{{ file.file.url }}" class="card-link" target="_blank">View</a>
-                    {% if request.user == project.created_by or request.user == file.uploaded_by or profile.is_pma_admin %}
+                    {% if request.user == project.created_by or request.user == file.uploaded_by or profile.is_pma_admin or request.user.profile.is_pma_admin %}
                         <form action="{% url 'users:delete-file' file.id %}" method="POST" style="display:inline;">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger">Delete</button>
