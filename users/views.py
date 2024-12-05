@@ -662,6 +662,19 @@ def create_announcement(request, slug):
     return HttpResponseNotAllowed(['POST'])
 
 @login_required
+def delete_announcement(request, announcement_id, slug):
+    cio = get_object_or_404(CIO, slug=slug)
+    announcement = get_object_or_404(Announcement, id=announcement_id, cio=cio)
+
+    if request.user == announcement.created_by or request.user in cio.admins.all():
+        announcement.delete()
+        messages.success(request, "Successful deletion")
+    else:
+        messages.error(request, "You are not authorized to do this.")
+
+    return redirect('users:cio-announcements', slug=slug)
+
+@login_required
 def announcements_page(request, slug):
     cio = get_object_or_404(CIO, slug=slug)
     if request.user not in cio.admins.all() and request.user not in cio.members.all():

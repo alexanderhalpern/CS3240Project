@@ -30,7 +30,9 @@
                                     <p class="text-muted mb-1">{{ announcement.created_at|date:"M d, Y H:i" }}</p>
                                 </div>
                                 {% if is_admin and announcement.created_by == user %}
-                                    <a href="#" class="btn btn-sm btn-danger" onclick="alert('Delete functionality not implemented yet.')">
+                                    <a href="{% url 'users:delete-announcement' slug=cio.slug announcement_id=announcement.id %}" 
+                                        class="btn btn-sm btn-danger" 
+                                        onclick="return confirm('Are you sure you want to delete this announcement?');">
                                         <i class="bi bi-trash"></i> Delete
                                     </a>
                                 {% endif %}
