@@ -84,7 +84,7 @@
             <h2 class="fw-bold m-0">
                 <i class="bi bi-folder2-open me-2"></i>My Projects
             </h2>
-            {% if user.profile.is_pma_admin %}
+            {% if request.user.profile.is_pma_admin %}
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProjectModal">
                 <i class="bi bi-plus-lg me-2"></i>Create Project
             </button>
@@ -105,7 +105,7 @@
                                     </div>
                                     <h5 class="card-title fw-bold mb-0">{{ p.name }}</h5>
                                 </div>
-                                {% if user.profile.is_pma_admin %}
+                                {% if profile.is_pma_admin %}
                                     <span class="badge bg-primary mb-3">Owner</span>
                                 {% endif %}
                                 <p class="card-title mb-0">{{ p.description }}</p>
@@ -126,12 +126,6 @@
                 <div class="card-body text-center py-5">
                     <i class="bi bi-folder-x display-3 text-muted mb-3"></i>
                     <h4 class="text-muted">No Projects Yet</h4>
-                    {% if user.profile.is_pma_admin %}
-                        <p class="mb-4">Start by creating your first project!</p>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProjectModal">
-                            <i class="bi bi-plus-lg me-2"></i>Create Project
-                        </button>
-                    {% endif %}
                 </div>
             </div>
         {% endif %}
