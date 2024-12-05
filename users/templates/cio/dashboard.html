@@ -84,11 +84,6 @@
             <h2 class="fw-bold m-0">
                 <i class="bi bi-folder2-open me-2"></i>My Projects
             </h2>
-            {% if request.user.profile.is_pma_admin %}
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProjectModal">
-                <i class="bi bi-plus-lg me-2"></i>Create Project
-            </button>
-            {% endif %}
         </div>
 
         {% if userProjects %}
@@ -230,11 +225,12 @@
                             }
                         </script>
 
-                        <!-- Submit Button -->
                         <div class="d-grid">
+                            { % if not request.user.profile.is_pma_admin %}
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="bi bi-check-circle me-2"></i>Create Project
                             </button>
+                            {% endif %}
                         </div>
                     </form>
                 </div>
