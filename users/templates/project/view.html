@@ -82,16 +82,6 @@
                     <button class="btn btn-primary" onclick="redirectToBooking()">Reserve Space</button>
                 </div>
             </div>
-
-            {% if request.user.profile.is_pma_admin %}
-                <form action="{% url 'users:delete-project' project.id %}" method="POST" 
-                onsubmit="return confirm('Are you sure you want to delete {{ project.name|escapejs }}? This action cannot be undone.');">
-            {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">
-                        <i class="bi bi-trash me-2"></i>Delete Project
-                    </button>
-                 </form>
-            {% endif %}
         </div>
     </div>
 

@@ -43,7 +43,12 @@ def continue_as_guest(request):
 def cio_detail(request, slug):
     cio = get_object_or_404(CIO, slug=slug)
     announcements = cio.announcements.order_by('-created_at')
-    user_projects = cio.projects.filter(members=request.user)
+
+    if request.user.profile.is_pma_admin:
+        user_projects = cio.projects.all()
+    else:
+        user_projects = cio.projects.filter(members=request.user)
+
     other_projects = cio.projects.exclude(members=request.user)
     upcoming_events = cio.events.filter(
         date__gte=datetime.date.today()).order_by('date')[:5]
