@@ -238,36 +238,38 @@ def request_to_join_project(request, project_id):
 
     if request.user not in project.cio.members.all():
         messages.error(request, "You have to be in this club to make a request.")
-        return redirect('users:cio-dashboard', slug=project.cio.slug)
+        return redirect('view-members', id=project_id)
 
     if request.user in project.members.all():
-        messages.warning(request, "You are already a member")
+        messages.warning(request, "You are already a member.")
     elif request.user in project.join_requests.all():
-        messages.warning(request, "You already made a request")
+        messages.warning(request, "You already made a request.")
     else:
         project.join_requests.add(request.user)
         messages.success(request, "Your request to join the project has been sent.")
 
-    return redirect('users:project-detail', project_id=project.id)
+    return redirect('view-members', id=project_id)
 
 @login_required
 def handle_join_request(request, project_id, user_id, action):
     project = get_object_or_404(Project, id=project_id)
 
     if request.user != project.created_by:
-        return HttpResponseForbidden("You are not the owner.")
+        return HttpResponseForbidden("You are not the owner of this project.")
 
     user = get_object_or_404(User, id=user_id)
 
     if action == 'accept':
         project.members.add(user)
         project.join_requests.remove(user)
-        messages.success(request, f"{user.first_name} was added")
+        messages.success(request, f"{user.first_name} was added to the project.")
     elif action == 'reject':
         project.join_requests.remove(user)
         messages.info(request, f"{user.first_name}'s request has been rejected.")
+    else:
+        messages.error(request, "Invalid action.")
 
-    return redirect('users:project-detail', project_id=project.id)
+    return redirect('view-members', id=project_id)
 
 @login_required
 def cio_dashboard(request, slug):
