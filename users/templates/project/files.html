@@ -9,7 +9,7 @@
             <i class="bi bi-arrow-left"></i> Back to Dashboard
         </a>
         <h1>Files for {{ project.name }}</h1>
-        {% if not profile.is_pma_admin %}
+        {% if not request.user.profile.is_pma_admin%}
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFileModal">
                 Add File
             </button>
