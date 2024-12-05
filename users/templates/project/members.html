@@ -18,13 +18,13 @@
                     <i class="bi bi-person-plus me-2"></i>Add Member
                 </button>
             {% else %}
-                <form method="POST" action="{% url 'users:leave-project' project.id %}" style="display:inline;">
+                <form method="POST" action="{% url 'users:leave-project' project_id %}" style="display:inline;">
                 {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Leave Project</button>
                 </form>
             {% endif %}
         {% else %}
-            <form method="post" action="{% url 'request-to-join-project' project.id %}">
+            <form method="post" action="{% url 'request-to-join-project' project_id %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-person-plus me-2"></i>Request to Join
@@ -41,11 +41,11 @@
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         {{ user.username }}
                         <div>
-                            <form method="POST" action="{% url 'handle-join-request' project.id user.id 'accept' %}" style="display:inline;">
+                            <form method="POST" action="{% url 'handle-join-request' project_id user.id 'accept' %}" style="display:inline;">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-success btn-sm">Accept</button>
                             </form>
-                            <form method="POST" action="{% url 'handle-join-request' project.id user.id 'reject' %}" style="display:inline;">
+                            <form method="POST" action="{% url 'handle-join-request' project_id user.id 'reject' %}" style="display:inline;">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger btn-sm">Reject</button>
                             </form>
@@ -94,7 +94,7 @@
                             </div>
                             
                             {% if is_owner and user != project.created_by %}
-                                <form method="POST" action="{% url 'users:remove-member' project.id user.id %}" class="ms-2">
+                                <form method="POST" action="{% url 'users:remove-member' project_id user.id %}" class="ms-2">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-outline-danger btn-sm" 
                                             onclick="return confirm('Are you sure you want to remove this member?');">
@@ -123,7 +123,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form method="POST" action="{% url 'users:add-member' project.id %}">
+                <form method="POST" action="{% url 'users:add-member' project_id %}">
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="email" class="form-label">User Email</label>
