@@ -114,7 +114,7 @@
         <div class="text-center mb-5">
             <h1 class="display-4 fw-bold">Student Organizations</h1>
             <p class="lead text-muted">Discover and join student organizations at UVA</p>
-            {% if profile.is_pma_admin %}
+            {% if request.user.profile.is_pma_admin %}
             <div class="alert alert-primary d-inline-flex align-items-center px-4 py-3" role="alert">
                 <i class="bi bi-shield-check fs-4 me-2"></i>
                 <div>
