@@ -248,7 +248,7 @@ def request_to_join_project(request, project_id):
         project.join_requests.add(request.user)
         messages.success(request, "Your request to join the project has been sent.")
 
-    return redirect('view-members', id=project_id)
+    return redirect('users:view-members', id=project_id)
 
 @login_required
 def handle_join_request(request, project_id, user_id, action):
