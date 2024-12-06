@@ -131,17 +131,7 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-if 'test' in sys.argv:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'test_db.sqlite3',
-        }
-    }
-    HEROKU_CONFIGURED = False
-else:
-    DATABASES = {
+DATABASES = {
         'default': {
             'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql'),
             'NAME': os.getenv('DB_NAME'),
@@ -151,7 +141,9 @@ else:
             'PORT': os.getenv('DB_PORT'),
         }
     }
-    HEROKU_CONFIGURED = True
+
+HEROKU_CONFIGURED = not 'test' in sys.argv
+
 
 #just for getting github actions to work
 if HEROKU_CONFIGURED:
