@@ -35,6 +35,7 @@
                     <p><strong>Size:</strong> {{ file.file_size }} KB</p>
                     <p><strong>Description:</strong> {{ file.description }}</p>
                     <p><strong>Keywords:</strong> {{ file.keywords }}</p>
+                    <p><strong>Timestamp:</strong> {{ file.upload_date|date:"F j, Y, g:i a" }}</p>
                     <a href="{{ file.file.url }}" class="card-link" target="_blank">View</a>
                     {% if request.user == project.created_by or request.user == file.uploaded_by or profile.is_pma_admin or request.user.profile.is_pma_admin %}
                         <form action="{% url 'users:delete-file' file.id %}" method="POST" style="display:inline;">
