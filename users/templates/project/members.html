@@ -12,7 +12,7 @@
             </a>
         </div>
         <h1 class="mb-0">Members of {{ project.name }}</h1>
-        {% if request.user in project.members.all user.profile.is_pma_admin or request.user.profile.is_pma_admin %}
+        {% if request.user in project.members.all %}
             {% if is_owner %}
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">
                     <i class="bi bi-person-plus me-2"></i>Add Member
@@ -120,7 +120,7 @@
 {% endblock %}
 
 {% block modals %}
-{% if is_owner or user.profile.is_pma_admin or request.user.profile.is_pma_admin %}
+{% if is_owner %}
 <div class="modal fade" id="addMemberModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
