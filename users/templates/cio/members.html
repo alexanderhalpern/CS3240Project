@@ -10,7 +10,7 @@
             <i class="bi bi-arrow-left"></i> Back to Dashboard
         </a>
         <h1 class="mb-0">Members of {{ cio.name }}</h1>
-        {% if is_admin or user.profile.is_pma_admin or request.user.profile.is_pma_admin %}
+        {% if is_admin %}
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">
                 <i class="bi bi-person-plus me-2"></i>Add Member
             </button>
@@ -74,7 +74,7 @@
 {% endblock %}
 
 {% block modals %}
-{% if is_admin or user.profile.is_pma_admin or request.user.profile.is_pma_admin %}
+{% if is_admin %}
 <div class="modal fade" id="addMemberModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
