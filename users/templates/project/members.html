@@ -120,7 +120,7 @@
 {% endblock %}
 
 {% block modals %}
-{% if is_owner %}
+{% if is_owner or user.profile.is_pma_admin %}
 <div class="modal fade" id="addMemberModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
