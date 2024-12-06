@@ -12,21 +12,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres" 
-          --health-interval 10s 
-          --health-timeout 5s 
-          --health-retries 5
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -43,13 +28,20 @@ jobs:
           pip install pytest pytest-django
 
       - name: Make migrations
+        env:
+          DJANGO_ENV: testing
         run: |
           python manage.py makemigrations
-      
+
       - name: Run migrations
+        env:
+          DJANGO_ENV: testing
         run: |
           python manage.py migrate
 
       - name: Run tests
+        env:
+          DJANGO_ENV: testing
+          DJANGO_SETTINGS_MODULE: project.settings
         run: |
           python manage.py test

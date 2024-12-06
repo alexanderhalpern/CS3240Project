@@ -133,14 +133,14 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 if 'test' in sys.argv:
-    #removed postgres
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'test_db.sqlite3',
         }
     }
-
+    #disable my heroku settings during testing, interferes with everything
+    HEROKU_CONFIGURED = False
 else:
     DATABASES = {
         'default': {
@@ -148,6 +148,11 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+    HEROKU_CONFIGURED = True
+
+#just for getting github actions to work
+if HEROKU_CONFIGURED:
+    django_heroku.settings(locals())
 
 
 # Password validation
@@ -189,8 +194,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-django_heroku.settings(locals())
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
