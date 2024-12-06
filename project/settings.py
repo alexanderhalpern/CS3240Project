@@ -133,16 +133,14 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 if 'test' in sys.argv:
+    #removed postgres
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'test_db',
-            'USER': 'postgres',
-            'PASSWORD': 'postgres',
-            'HOST': 'localhost',
-            'PORT': '5432',
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'test_db.sqlite3',
         }
     }
+
 else:
     DATABASES = {
         'default': {

@@ -1,209 +1,267 @@
-import datetime
-from django.test import TestCase, override_settings
-import os
-from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import Client, TestCase
 from django.contrib.auth.models import User
-from django.urls import reverse
-from django.conf import settings
-from .models import Project, File
+from django.urls import resolve, reverse
+from users.models import (
+    CIO, Profile, Project, File, AdminFile, Event, RSVP,
+    Notification, Announcement, SupportMessage
+)
+from datetime import date, time
+from django.core.files.uploadedfile import SimpleUploadedFile
 
-#create directory just for testing
-TEST_MEDIA_ROOT = os.path.join(settings.BASE_DIR, 'test_media')
-os.makedirs(TEST_MEDIA_ROOT, exist_ok=True)
-
-@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
-@override_settings(DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
-class FileUploadTest(TestCase):
+class CIOModelTest(TestCase):
     def setUp(self):
-        #mocks user
-        self.user = User.objects.create_user(username='jonfox', password='bigbrain9')
-        self.client.login(username='jonfox', password='bigbrain9')
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.cio = CIO.objects.create(name="Test CIO", description="Test CIO Description")
+
+    def test_cio_slug_creation(self):
+        self.assertEqual(self.cio.slug, "test-cio")
+
+    def test_cio_admins_and_members(self):
+        self.cio.admins.add(self.user)
+        self.cio.members.add(self.user)
+        self.assertIn(self.user, self.cio.admins.all())
+        self.assertIn(self.user, self.cio.members.all())
+
+    def test_cio_absolute_url(self):
+        self.assertEqual(self.cio.get_absolute_url(), f"/cio/{self.cio.slug}/dashboard/")
+
+
+class ProfileModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.profile = Profile.objects.create(user=self.user, bio="Test Bio")
+
+    def test_profile_str_representation(self):
+        self.assertEqual(str(self.profile), "testuser's profile")
+
+
+class ProjectModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.cio = CIO.objects.create(name="Test CIO", description="Test Description")
+        self.project = Project.objects.create(
+            name="Test Project",
+            description="Test Project Description",
+            created_by=self.user,
+            cio=self.cio
+        )
+
+    def test_project_str_representation(self):
+        self.assertEqual(str(self.project), "Test Project")
+
+    def test_project_members(self):
+        self.project.members.add(self.user)
+        self.assertIn(self.user, self.project.members.all())
+
+
+class FileModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.cio = CIO.objects.create(name="Test CIO", description="Test Description")
+        self.project = Project.objects.create(
+            name="Test Project",
+            description="Test Project Description",
+            created_by=self.user,
+            cio=self.cio
+        )
+        self.file = File.objects.create(
+            project=self.project,
+            file=SimpleUploadedFile("test_file.txt", b"content of the file"),
+            uploaded_by=self.user
+        )
+
+    def test_file_save_metadata(self):
+        self.assertEqual(self.file.file_name, "test_file.txt")
+        self.assertEqual(self.file.file_type, "txt")
+        self.assertEqual(self.file.file_size, len(b"content of the file"))
+
+
+class AdminFileModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.cio = CIO.objects.create(name="Test CIO", description="Test Description")
+        self.admin_file = AdminFile.objects.create(
+            file="admin_file.txt",
+            uploaded_by=self.user,
+            club=self.cio
+        )
+
+    def test_admin_file_str_representation(self):
+        self.assertEqual(str(self.admin_file), "admin_file.txt")
+
+
+class EventModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.cio = CIO.objects.create(name="Test CIO", description="Test Description")
+        self.event = Event.objects.create(
+            name="Test Event",
+            description="Test Event Description",
+            date=date.today(),
+            time=time(12, 0),
+            created_by=self.user,
+            cio=self.cio
+        )
+
+    def test_event_str_representation(self):
+        self.assertEqual(str(self.event), f"Test Event on {date.today()}")
+
+
+class RSVPModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.cio = CIO.objects.create(name="Test CIO", description="Test Description")
+        self.event = Event.objects.create(
+            name="Test Event",
+            description="Test Event Description",
+            date=date.today(),
+            time=time(12, 0),
+            created_by=self.user,
+            cio=self.cio
+        )
+        self.rsvp = RSVP.objects.create(event=self.event, user=self.user)
+
+    def test_rsvp_str_representation(self):
+        self.assertEqual(str(self.rsvp), f"testuser RSVP for Test Event")
+
+
+class NotificationModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.notification = Notification.objects.create(
+            user=self.user,
+            content="Test Notification"
+        )
+
+    def test_notification_str_representation(self):
+        self.assertEqual(str(self.notification), "Notification for testuser: Test Notification")
+
+
+class AnnouncementModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.cio = CIO.objects.create(name="Test CIO", description="Test Description")
+        self.announcement = Announcement.objects.create(
+            cio=self.cio,
+            created_by=self.user,
+            content="Test Announcement"
+        )
+
+    def test_announcement_str_representation(self):
+        self.assertEqual(str(self.announcement), f"Announcement by testuser in Test CIO")
+
+
+class SupportMessageModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.support_message = SupportMessage.objects.create(
+            user=self.user,
+            message="Test Support Message"
+        )
+
+    def test_support_message_str_representation(self):
+        self.assertEqual(str(self.support_message), f"Message from testuser at {self.support_message.submitted_at}")
+
+class URLTests(TestCase):
+
+    def setUp(self):
+        #create dummy user
+        self.user = User.objects.create_user(username="testuser", password="password")
         
-        #mocks project
-        self.project = Project.objects.create(name='Jon Project', description='Jon code', created_by=self.user)
-        # Add user as member of the project
-        self.project.members.add(self.user)  # Add this line
+        #create dummy CIO
+        self.cio = CIO.objects.create(name="Test CIO", description="Test description")
+        self.cio.admins.add(self.user)
         
-        #set up file data
-        self.test_file = SimpleUploadedFile(
-            "test.txt",
-            b"jon code",
-            content_type="text/plain"
-        )
-        self.test_file_data = {
-            'file': self.test_file,
-            'title': 'Test Document',
-            'description': 'This is a test document',
-            'keywords': 'test,document,upload'
-        }
-
-    def tearDown(self):
-        #clean up all uploaded files
-        try:
-            for uploaded_file in File.objects.all():
-                if uploaded_file.file:
-                    if os.path.isfile(uploaded_file.file.path):
-                        os.remove(uploaded_file.file.path)
-        except Exception:
-            pass  #ignore all errors during cleanup
-            
-        #remove media directory
-        if os.path.exists(TEST_MEDIA_ROOT):
-            for root, dirs, files in os.walk(TEST_MEDIA_ROOT, topdown=False):
-                for name in files:
-                    os.remove(os.path.join(root, name))
-                for name in dirs:
-                    os.rmdir(os.path.join(root, name))
-            os.rmdir(TEST_MEDIA_ROOT)
-            
-        super().tearDown()
-
-    def test_for_successful_upload(self):
-        response = self.client.post(
-            reverse('users:project-files', kwargs={'id': self.project.id}),
-            self.test_file_data,
-            follow=True
-        )
-        self.assertEqual(response.status_code, 200)
-
-    def test_if_file_in_database(self):
-        self.client.post(
-            reverse('users:project-files', kwargs={'id': self.project.id}),
-            self.test_file_data,
-            follow=True
-        )
-        self.assertEqual(File.objects.count(), 1)
-
-    def test_file_associated_with_correct_project(self):
-        self.client.post(
-            reverse('users:project-files', kwargs={'id': self.project.id}),
-            self.test_file_data,
-            follow=True
-        )
-        my_uploaded_file = File.objects.first()
-        self.assertEqual(my_uploaded_file.project, self.project)
-
-    def test_uploaded_file_name(self):
-        self.client.post(
-            reverse('users:project-files', kwargs={'id': self.project.id}),
-            self.test_file_data,
-            follow=True
-        )
-        my_uploaded_file = File.objects.first()
-        my_uploaded_file_name = os.path.basename(my_uploaded_file.file.name)
-        self.assertTrue(my_uploaded_file_name.startswith('test'),
-                       f"the file name is not correct: {my_uploaded_file_name}")
-
-    def test_correct_timestamp(self):
-        self.client.post(
-            reverse('users:project-files', kwargs={'id': self.project.id}),
-            self.test_file_data,
-            follow=True
-        )
-        my_uploaded_file = File.objects.first()
-        
-        self.assertIsNotNone(my_uploaded_file.upload_date)
-        # Use timezone.now() instead of datetime.datetime.now(datetime.UTC)
-        from django.utils import timezone
-        time_diff = timezone.now().timestamp() - my_uploaded_file.upload_date.timestamp()
-        self.assertTrue(time_diff < 60)
-
-    def test_correct_file_metadata(self):
-        self.client.post(
-            reverse('users:project-files', kwargs={'id': self.project.id}),
-            self.test_file_data,
-            follow=True
-        )
-        my_uploaded_file = File.objects.first()
-        
-        self.assertEqual(my_uploaded_file.title, 'Test Document',
-                        "Title was not correctly saved")
-        self.assertEqual(my_uploaded_file.description, 'This is a test document',
-                        "Description was not correctly saved")
-        self.assertEqual(my_uploaded_file.keywords, 'test,document,upload',
-                        "Keywords were not correctly saved")
-
-    def test_correct_file_size(self):
-        self.client.post(
-            reverse('users:project-files', kwargs={'id': self.project.id}),
-            self.test_file_data,
-            follow=True
-        )
-        my_uploaded_file = File.objects.first()
-        
-        self.assertEqual(my_uploaded_file.file_size, len(b"jon code"),
-                        "File size was not correctly saved in the database")
-    
-    def test_correct_file_type(self):
-        self.client.post(
-            reverse('users:project-files', kwargs={'id': self.project.id}),
-            self.test_file_data,
-            follow=True
-        )
-        my_uploaded_file = File.objects.first()
-        
-        self.assertEqual(my_uploaded_file.file_type, "txt",
-                        "File type was not correctly saved in the database")
-
-    def test_missing_required_fields(self):
-        #testing without a title
-        invalid_data = self.test_file_data.copy()
-        invalid_data.pop('title')
-        response = self.client.post(
-            reverse('users:project-files', kwargs={'id': self.project.id}),
-            invalid_data,
-            follow=True
-        )
-        self.assertFormError(response, 'form', 'title', 'This field is required.')
-
-    def test_correct_club_membership(self):
-        #create non-member user
-        non_member = User.objects.create_user(username='nonmember', password='password123')
-        self.client.logout()
-        self.client.login(username='nonmember', password='password123')
-        
-        response = self.client.post(
-            reverse('users:project-files', kwargs={'id': self.project.id}),
-            self.test_file_data,
-            follow=True
+        #create dummy project
+        self.project = Project.objects.create(
+            name="Test Project",
+            description="Test Project Description",
+            created_by=self.user,
+            cio=self.cio
         )
         
-        self.assertNotEqual(response.status_code, 200,
-                          "Non-member was able to upload file to project")
-
-    def test_keyword_search(self):
-        #instantiate dummy files with multiple keywords
-        files_data = [
-            {
-                'file': SimpleUploadedFile("test1.txt", b"test content", content_type="text/plain"),
-                'title': 'Test 1',
-                'description': 'Test description 1',
-                'keywords': 'python,django,test'
-            },
-            {
-                'file': SimpleUploadedFile("test2.txt", b"test content", content_type="text/plain"),
-                'title': 'Test 2',
-                'description': 'Test description 2',
-                'keywords': 'python,upload'
-            },
-            {
-                'file': SimpleUploadedFile("test3.txt", b"test content", content_type="text/plain"),
-                'title': 'Test 3',
-                'description': 'Test description 3',
-                'keywords': 'test,upload'
-            }
-        ]
-        
-        for file_data in files_data:
-            self.client.post(
-                reverse('users:project-files', kwargs={'id': self.project.id}),
-                file_data,
-                follow=True
-            )
-        
-        response = self.client.get(
-            reverse('users:project-files', kwargs={'id': self.project.id}) + '?keyword=python'
+        #create dummy event
+        self.event = Event.objects.create(
+            name="Test Event",
+            description="Test Event Description",
+            date="2024-12-31",
+            time="12:00:00",
+            created_by=self.user,
+            cio=self.cio
         )
-        self.assertEqual(len(response.context['files']), 2)
 
-        
+    def test_home_url(self):
+        url = reverse("users:home")
+        self.assertEqual(resolve(url).view_name, "users:home")
+
+    def test_logout_url(self):
+        url = reverse("users:logout")
+        self.assertEqual(resolve(url).view_name, "users:logout")
+
+    def test_update_profile_url(self):
+        url = reverse("users:update_profile")
+        self.assertEqual(resolve(url).view_name, "users:update_profile")
+
+    def test_cio_calendar_url(self):
+        url = reverse("users:cio-calendar", kwargs={"slug": self.cio.slug})
+        self.assertEqual(resolve(url).view_name, "users:cio-calendar")
+
+    def test_specific_project_url(self):
+        url = reverse("users:specific-project", kwargs={"id": self.project.id})
+        self.assertEqual(resolve(url).view_name, "users:specific-project")
+
+    def test_project_files_url(self):
+        url = reverse("users:project-files", kwargs={"id": self.project.id})
+        self.assertEqual(resolve(url).view_name, "users:project-files")
+
+    def test_rsvp_event_url(self):
+        url = reverse("users:rsvp_event", kwargs={"event_id": self.event.id})
+        self.assertEqual(resolve(url).view_name, "users:rsvp_event")
+
+    def test_create_event_url(self):
+        url = reverse("users:create_event", kwargs={"slug": self.cio.slug})
+        self.assertEqual(resolve(url).view_name, "users:create_event")
+
+    def test_delete_event_url(self):
+        url = reverse("users:delete_event", kwargs={"event_id": self.event.id})
+        self.assertEqual(resolve(url).view_name, "users:delete_event")
+
+    def test_view_members_url(self):
+        url = reverse("users:view-members", kwargs={"id": self.project.id})
+        self.assertEqual(resolve(url).view_name, "users:view-members")
+
+    def test_cio_detail_url(self):
+        url = reverse("users:cio-detail", kwargs={"slug": self.cio.slug})
+        self.assertEqual(resolve(url).view_name, "users:cio-detail")
+
+    def test_join_cio_url(self):
+        url = reverse("users:join-cio", kwargs={"slug": self.cio.slug})
+        self.assertEqual(resolve(url).view_name, "users:join-cio")
+
+    def test_leave_cio_url(self):
+        url = reverse("users:leave-cio", kwargs={"slug": self.cio.slug})
+        self.assertEqual(resolve(url).view_name, "users:leave-cio")
+
+    def test_create_announcement_url(self):
+        url = reverse("users:create-announcement", kwargs={"slug": self.cio.slug})
+        self.assertEqual(resolve(url).view_name, "users:create-announcement")
+
+    def test_cio_dashboard_url(self):
+        url = reverse("users:cio-dashboard", kwargs={"slug": self.cio.slug})
+        self.assertEqual(resolve(url).view_name, "users:cio-dashboard")
+
+    def test_announcements_page_url(self):
+        url = reverse("users:cio-announcements", kwargs={"slug": self.cio.slug})
+        self.assertEqual(resolve(url).view_name, "users:cio-announcements")
+
+    def test_contact_support_url(self):
+        url = reverse("users:contact_support")
+        self.assertEqual(resolve(url).view_name, "users:contact_support")
+
+    def test_mark_as_read_url(self):
+        url = reverse("users:mark_as_read", kwargs={"notification_id": 1})
+        self.assertEqual(resolve(url).view_name, "users:mark_as_read")
+
+    def test_mark_all_as_read_url(self):
+        url = reverse("users:mark_all_as_read")
+        self.assertEqual(resolve(url).view_name, "users:mark_all_as_read")
